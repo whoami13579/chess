@@ -3,4 +3,10 @@ project(chess)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(chess main.cpp)
+find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
+include_directories(${SFML_INCLUDE_DIRS})
+include_directories(/usr/local/include)
+set(SOURCE_FILES main.cpp pieces/PieceTexture.cpp pieces/PieceTexture.h)
+
+add_executable(chess ${SOURCE_FILES})
+target_link_libraries(chess sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
