@@ -5,6 +5,7 @@
 #ifndef CHESS_CHESSGAME_H
 #define CHESS_CHESSGAME_H
 
+#include <iostream>
 #include "Board.h"
 #include "LegalMove.h"
 #include "Piece.h"
@@ -13,7 +14,7 @@ class ChessGame : public sf::Drawable {
 private:
     Board board;
     LegalMove legalMove;
-    Piece materials[32];
+    Piece pieces[32];
 
     sf::RectangleShape restartButton; //There isn't button class in sfml, so restartButton in just white area.
 

@@ -7,7 +7,6 @@
 ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     board = Board(c1, c2);
 
-//    font.loadFromFile("/Users/mba/myCode/chess/Textures/arial.ttf");
     font.loadFromFile("../Textures/arial.ttf");
 
     restartButton.setFillColor(sf::Color::White);
@@ -29,7 +28,6 @@ ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
 
 void ChessGame::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(board);
-//    target.draw(pieces);
     drawMaterial(target, states);
     target.draw(legalMove);
     target.draw(restartButton);
@@ -54,83 +52,89 @@ void ChessGame::restart() {
     }
 
 
-    materials[0].setPosition(7, 4);
-    materials[1].setPosition(0, 4);
-    materials[2].setPosition(7, 3);
-    materials[3].setPosition(0, 3);
-    materials[4].setPosition(7, 2);
-    materials[5].setPosition(7, 5);
-    materials[6].setPosition(0, 2);
-    materials[7].setPosition(0, 5);
-    materials[8].setPosition(7, 1);
-    materials[9].setPosition(7, 6);
-    materials[10].setPosition(0, 1);
-    materials[11].setPosition(0, 6);
-    materials[12].setPosition(7, 0);
-    materials[13].setPosition(7, 7);
-    materials[14].setPosition(0, 0);
-    materials[15].setPosition(0, 7);
+    pieces[0].setPosition(7, 4);
+    pieces[1].setPosition(0, 4);
+    pieces[2].setPosition(7, 3);
+    pieces[3].setPosition(0, 3);
+    pieces[4].setPosition(7, 2);
+    pieces[5].setPosition(7, 5);
+    pieces[6].setPosition(0, 2);
+    pieces[7].setPosition(0, 5);
+    pieces[8].setPosition(7, 1);
+    pieces[9].setPosition(7, 6);
+    pieces[10].setPosition(0, 1);
+    pieces[11].setPosition(0, 6);
+    pieces[12].setPosition(7, 0);
+    pieces[13].setPosition(7, 7);
+    pieces[14].setPosition(0, 0);
+    pieces[15].setPosition(0, 7);
     for(int i = 0; i < 8; i++) {
-        materials[i+16].setPosition(6, i);
+        pieces[i + 16].setPosition(6, i);
     }
     for(int i = 0; i < 8; i++) {
-        materials[i+24].setPosition(1, i);
+        pieces[i + 24].setPosition(1, i);
     }
 }
 
 void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int col) {
-    while (window.isOpen()) {
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-
-            if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
-                        (event.mouseButton.y < 1500)) {
-                        legalMove.setMove(row, col);
-                        return;
-                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
-                               (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
-                        restart();
-                    }
-                } else if (event.mouseButton.button == sf::Mouse::Right) {
-                    return;
-                }
-            }
+    for(int i = 0; i < 32; i++) {
+        if(row == pieces[i].getPosition().at(0) && col == pieces[i].getPosition().at(1)) {
+            std::cout << pieces[i].getType() << std::endl;
         }
     }
+
+//    while (window.isOpen()) {
+//        while (window.pollEvent(event)) {
+//            if (event.type == sf::Event::Closed) {
+//                window.close();
+//            }
+//
+//            if (event.type == sf::Event::MouseButtonPressed) {
+//                if (event.mouseButton.button == sf::Mouse::Left) {
+//                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
+//                        (event.mouseButton.y < 1500)) {
+//                        legalMove.setMove(row, col);
+//                        return;
+//                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
+//                               (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
+//                        restart();
+//                    }
+//                } else if (event.mouseButton.button == sf::Mouse::Right) {
+//                    return;
+//                }
+//            }
+//        }
+//    }
 }
 
 void ChessGame::drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const {
     for(int i = 0; i < 32; i++) {
-        materials[i].draw(target, states);
+        pieces[i].draw(target, states);
     }
 }
 
 void ChessGame::createMaterials() {
-    materials[0] = Piece('K');
-    materials[1] = Piece('k');
-    materials[2] = Piece('Q');
-    materials[3] = Piece('q');
-    materials[4] = Piece('B');
-    materials[5] = Piece('B');
-    materials[6] = Piece('b');
-    materials[7] = Piece('b');
-    materials[8] = Piece('N');
-    materials[9] = Piece('N');
-    materials[10] = Piece('n');
-    materials[11] = Piece('n');
-    materials[12] = Piece('R');
-    materials[13] = Piece('R');
-    materials[14] = Piece('r');
-    materials[15] = Piece('r');
+    pieces[0] = Piece('K');
+    pieces[1] = Piece('k');
+    pieces[2] = Piece('Q');
+    pieces[3] = Piece('q');
+    pieces[4] = Piece('B');
+    pieces[5] = Piece('B');
+    pieces[6] = Piece('b');
+    pieces[7] = Piece('b');
+    pieces[8] = Piece('N');
+    pieces[9] = Piece('N');
+    pieces[10] = Piece('n');
+    pieces[11] = Piece('n');
+    pieces[12] = Piece('R');
+    pieces[13] = Piece('R');
+    pieces[14] = Piece('r');
+    pieces[15] = Piece('r');
 
     for(int i = 16; i < 24; i++) {
-        materials[i] = Piece('P');
+        pieces[i] = Piece('P');
     }
     for(int i = 24; i < 32; i++) {
-        materials[i] = Piece('p');
+        pieces[i] = Piece('p');
     }
 }

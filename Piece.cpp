@@ -66,3 +66,11 @@ void Piece::setPosition(int row, int col)
 
     sprite.setPosition(sf::Vector2f((float)col*187.5f + 187.5f/2.f, (float)row*187.5f + 187.5f/2.f));
 }
+
+std::vector<int> Piece::getPosition() {
+    return {row, col};
+}
+
+char Piece::getType() {
+    return type;
+}
