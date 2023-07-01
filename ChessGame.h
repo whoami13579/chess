@@ -6,14 +6,14 @@
 #define CHESS_CHESSGAME_H
 
 #include "Board.h"
-#include "pieces/Pieces.h"
 #include "LegalMove.h"
+#include "Material.h"
 
 class ChessGame : public sf::Drawable {
 private:
     Board board;
-    Pieces pieces;
     LegalMove legalMove;
+    Material materials[32];
 
     sf::RectangleShape restartButton; //There isn't button class in sfml, so restartButton in just white area.
 
@@ -21,12 +21,14 @@ private:
     sf::Text restartText; //This is just the text displaied in the white area.
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
+    void drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const;
 
 public:
     ChessGame(sf::Color c1, sf::Color c2);
     void test(sf::Event &event, sf::RenderWindow &window, int row, int col);
 
     void restart();
+    void createMaterials();
 };
 
 

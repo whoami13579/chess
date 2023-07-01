@@ -7,7 +7,8 @@
 ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     board = Board(c1, c2);
 
-    font.loadFromFile("/Users/mba/myCode/chessGame/Textures/arial.ttf");
+//    font.loadFromFile("/Users/mba/myCode/chess/Textures/arial.ttf");
+    font.loadFromFile("../Textures/arial.ttf");
 
     restartButton.setFillColor(sf::Color::White);
     restartButton.setOutlineThickness(-5.f);
@@ -22,12 +23,14 @@ ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     restartText.setFillColor(sf::Color::Black);
     restartText.setPosition(restartButton.getPosition().x + 180.f, restartButton.getPosition().y + 10.f);
 
+    createMaterials();
     restart();
 }
 
 void ChessGame::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(board);
-    target.draw(pieces);
+//    target.draw(pieces);
+    drawMaterial(target, states);
     target.draw(legalMove);
     target.draw(restartButton);
     target.draw(restartText);
@@ -50,27 +53,28 @@ void ChessGame::restart() {
         color = !color;
     }
 
-    pieces.pieceArr[0]->setPosition(7, 4);
-    pieces.pieceArr[1]->setPosition(0, 4);
-    pieces.pieceArr[2]->setPosition(7, 3);
-    pieces.pieceArr[3]->setPosition(0, 3);
-    pieces.pieceArr[4]->setPosition(7, 2);
-    pieces.pieceArr[5]->setPosition(7, 5);
-    pieces.pieceArr[6]->setPosition(0, 2);
-    pieces.pieceArr[7]->setPosition(0, 5);
-    pieces.pieceArr[8]->setPosition(7, 1);
-    pieces.pieceArr[9]->setPosition(7, 6);
-    pieces.pieceArr[10]->setPosition(0, 1);
-    pieces.pieceArr[11]->setPosition(0, 6);
-    pieces.pieceArr[12]->setPosition(7, 0);
-    pieces.pieceArr[13]->setPosition(7, 7);
-    pieces.pieceArr[14]->setPosition(0, 0);
-    pieces.pieceArr[15]->setPosition(0, 7);
+
+    materials[0].setPosition(7, 4);
+    materials[1].setPosition(0, 4);
+    materials[2].setPosition(7, 3);
+    materials[3].setPosition(0, 3);
+    materials[4].setPosition(7, 2);
+    materials[5].setPosition(7, 5);
+    materials[6].setPosition(0, 2);
+    materials[7].setPosition(0, 5);
+    materials[8].setPosition(7, 1);
+    materials[9].setPosition(7, 6);
+    materials[10].setPosition(0, 1);
+    materials[11].setPosition(0, 6);
+    materials[12].setPosition(7, 0);
+    materials[13].setPosition(7, 7);
+    materials[14].setPosition(0, 0);
+    materials[15].setPosition(0, 7);
     for(int i = 0; i < 8; i++) {
-        pieces.pieceArr[i+16]->setPosition(6, i);
+        materials[i+16].setPosition(6, i);
     }
     for(int i = 0; i < 8; i++) {
-        pieces.pieceArr[i+24]->setPosition(1, i);
+        materials[i+24].setPosition(1, i);
     }
 }
 
@@ -96,5 +100,37 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
                 }
             }
         }
+    }
+}
+
+void ChessGame::drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const {
+    for(int i = 0; i < 32; i++) {
+        materials[i].draw(target, states);
+    }
+}
+
+void ChessGame::createMaterials() {
+    materials[0] = Material('K');
+    materials[1] = Material('k');
+    materials[2] = Material('Q');
+    materials[3] = Material('q');
+    materials[4] = Material('B');
+    materials[5] = Material('B');
+    materials[6] = Material('b');
+    materials[7] = Material('b');
+    materials[8] = Material('N');
+    materials[9] = Material('N');
+    materials[10] = Material('n');
+    materials[11] = Material('n');
+    materials[12] = Material('R');
+    materials[13] = Material('R');
+    materials[14] = Material('r');
+    materials[15] = Material('r');
+
+    for(int i = 16; i < 24; i++) {
+        materials[i] = Material('P');
+    }
+    for(int i = 24; i < 32; i++) {
+        materials[i] = Material('p');
     }
 }
