@@ -2,11 +2,11 @@
 // Created by 褚翊喨 on 2023/7/1.
 //
 
-#include "Material.h"
+#include "Piece.h"
 
-Material::Material() = default;
+Piece::Piece() = default;
 
-Material::Material(char type) {
+Piece::Piece(char type) {
     this->type = type;
 
     switch (type) {
@@ -53,16 +53,16 @@ Material::Material(char type) {
 
 }
 
-void Material::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     if(d) {
         target.draw(sprite);
     }
 }
 
-void Material::setPosition(int row, int col)
+void Piece::setPosition(int row, int col)
 {
     this->row = row;
     this->col = col;
 
-    sprite.setPosition(sf::Vector2f(col*187.5 + 187.5/2, row*187.5 + 187.5/2));
+    sprite.setPosition(sf::Vector2f((float)col*187.5f + 187.5f/2.f, (float)row*187.5f + 187.5f/2.f));
 }

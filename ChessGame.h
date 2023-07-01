@@ -7,13 +7,13 @@
 
 #include "Board.h"
 #include "LegalMove.h"
-#include "Material.h"
+#include "Piece.h"
 
 class ChessGame : public sf::Drawable {
 private:
     Board board;
     LegalMove legalMove;
-    Material materials[32];
+    Piece materials[32];
 
     sf::RectangleShape restartButton; //There isn't button class in sfml, so restartButton in just white area.
 

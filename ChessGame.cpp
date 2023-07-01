@@ -110,27 +110,27 @@ void ChessGame::drawMaterial(sf::RenderTarget &target, sf::RenderStates states) 
 }
 
 void ChessGame::createMaterials() {
-    materials[0] = Material('K');
-    materials[1] = Material('k');
-    materials[2] = Material('Q');
-    materials[3] = Material('q');
-    materials[4] = Material('B');
-    materials[5] = Material('B');
-    materials[6] = Material('b');
-    materials[7] = Material('b');
-    materials[8] = Material('N');
-    materials[9] = Material('N');
-    materials[10] = Material('n');
-    materials[11] = Material('n');
-    materials[12] = Material('R');
-    materials[13] = Material('R');
-    materials[14] = Material('r');
-    materials[15] = Material('r');
+    materials[0] = Piece('K');
+    materials[1] = Piece('k');
+    materials[2] = Piece('Q');
+    materials[3] = Piece('q');
+    materials[4] = Piece('B');
+    materials[5] = Piece('B');
+    materials[6] = Piece('b');
+    materials[7] = Piece('b');
+    materials[8] = Piece('N');
+    materials[9] = Piece('N');
+    materials[10] = Piece('n');
+    materials[11] = Piece('n');
+    materials[12] = Piece('R');
+    materials[13] = Piece('R');
+    materials[14] = Piece('r');
+    materials[15] = Piece('r');
 
     for(int i = 16; i < 24; i++) {
-        materials[i] = Material('P');
+        materials[i] = Piece('P');
     }
     for(int i = 24; i < 32; i++) {
-        materials[i] = Material('p');
+        materials[i] = Piece('p');
     }
 }

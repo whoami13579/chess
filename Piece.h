@@ -2,15 +2,15 @@
 // Created by 褚翊喨 on 2023/7/1.
 //
 
-#ifndef CHESS_MATERIAL_H
-#define CHESS_MATERIAL_H
+#ifndef CHESS_PIECE_H
+#define CHESS_PIECE_H
 
 #include "PieceTexture.h"
 
-class Material : public sf::Drawable{
+class Piece : public sf::Drawable{
 public:
-    Material();
-    Material(char type);
+    Piece();
+    Piece(char type);
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
     virtual void setPosition(int row, int col);
 
@@ -23,4 +23,4 @@ private:
 };
 
 
-#endif //CHESS_MATERIAL_H
+#endif //CHESS_PIECE_H
