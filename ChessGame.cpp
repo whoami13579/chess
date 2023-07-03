@@ -74,37 +74,64 @@ void ChessGame::restart() {
     for(int i = 0; i < 8; i++) {
         pieces[i + 24].setPosition(1, i);
     }
+
+    turn = true;
 }
 
 void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int col) {
-    for(int i = 0; i < 32; i++) {
+    int i;
+    for(i = 0; i < 32; i++) {
         if(row == pieces[i].getPosition().at(0) && col == pieces[i].getPosition().at(1)) {
             std::cout << pieces[i].getType() << std::endl;
+            break;
+        }
+    }
+    if((i == 31) && (row != pieces[i].getPosition().at(0) || col != pieces[0].getPosition().at(0))) {
+        std::cout << "line 90" << std::endl;
+        return;
+    }
+    if(!turn && 'A'<= pieces[i].getType() && pieces[i].getType() <= 'Z') {
+        return;
+    }
+    else if(turn && 'a' <= pieces[i].getType() && pieces[i].getType() <= 'z') {
+        return;
+    }
+    std::cout << "line 99" << std::endl;
+
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed) {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
+                        (event.mouseButton.y < 1500)) {
+//                        legalMove.setMove(row, col);
+//                        if(board.chessBoard[(int (event.mouseButton.y/187.5)*8) + int (event.mouseButton.x/187.5)])
+                        pieces[i].setPosition((int)(event.mouseButton.y/187.5), (int)(event.mouseButton.x/187.5));
+                        turn = !turn;
+                        std::cout << "line 110" << std::endl;
+                        return;
+                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
+                               (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
+                        restart();
+                        return;
+                    }
+                } else if (event.mouseButton.button == sf::Mouse::Right) {
+                    std::cout << "line 116" << std::endl;
+                    return;
+                }
+                else {
+                    std::cout << "line 120" << std::endl;
+                    return;
+                }
+            }
         }
     }
 
-//    while (window.isOpen()) {
-//        while (window.pollEvent(event)) {
-//            if (event.type == sf::Event::Closed) {
-//                window.close();
-//            }
-//
-//            if (event.type == sf::Event::MouseButtonPressed) {
-//                if (event.mouseButton.button == sf::Mouse::Left) {
-//                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
-//                        (event.mouseButton.y < 1500)) {
-//                        legalMove.setMove(row, col);
-//                        return;
-//                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
-//                               (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
-//                        restart();
-//                    }
-//                } else if (event.mouseButton.button == sf::Mouse::Right) {
-//                    return;
-//                }
-//            }
-//        }
-//    }
+//    turn = !turn;
 }
 
 void ChessGame::drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const {

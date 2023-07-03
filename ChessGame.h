@@ -30,6 +30,7 @@ public:
 
     void restart();
     void createMaterials();
+    bool turn = true; // white : true, black false
 };
 
 
