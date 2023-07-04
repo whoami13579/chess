@@ -7,9 +7,9 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(2000, 1500), "chess", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
+    sf::Event event = sf::Event();
 
     while (window.isOpen()) {
-        sf::Event event = sf::Event();
 
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -28,7 +28,6 @@ int main() {
                 }
             }
         }
-
         window.draw(chessGame);
         window.display();
     }
