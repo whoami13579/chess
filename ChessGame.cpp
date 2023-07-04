@@ -12,7 +12,7 @@ ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     restartButton.setFillColor(sf::Color::White);
     restartButton.setOutlineThickness(-5.f);
     restartButton.setOutlineColor(sf::Color::Black);
-    restartButton.setPosition(sf::Vector2f(1500.f, 0.f));
+    restartButton.setPosition(sf::Vector2f(1200.f, 0.f));
     restartButton.setSize(sf::Vector2f(500.f, 50.f));
 
     restartText.setFont(font);
@@ -42,8 +42,8 @@ void ChessGame::restart() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             tmp = (i * 8) + j;
-            board.squares[tmp].setPosition((float) i * 187.5f, (float) j * 187.5f);
-            board.squares[tmp].setSize(sf::Vector2f(187.5f, 187.5f));
+            board.squares[tmp].setPosition(i * 150, j * 150);
+            board.squares[tmp].setSize(sf::Vector2f((float)150, (float)150));
             board.squares[tmp].setFillColor((color ? board.c1 : board.c2));
 
             color = !color;
@@ -106,15 +106,15 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
-                        (event.mouseButton.y < 1500)) {
-//                        legalMove.setMove(row, col);
-//                        if(board.chessBoard[(int (event.mouseButton.y/187.5)*8) + int (event.mouseButton.x/187.5)])
-                        pieces[i].setPosition((int)(event.mouseButton.y/187.5), (int)(event.mouseButton.x/187.5));
+                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
+                        (event.mouseButton.y < 1200)) {
+                        legalMove.setMove(row, col);
+                        if(board.chessBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
+                        pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
                         turn = !turn;
                         std::cout << "line 110" << std::endl;
                         return;
-                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
+                    } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
                                (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
                         restart();
                         return;

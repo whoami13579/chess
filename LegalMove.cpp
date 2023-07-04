@@ -10,8 +10,8 @@ LegalMove::LegalMove()
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             tmp = (i * 8) + j;
-            circles[tmp].setPosition((float) i * 187.5f+40, (float) j * 187.5f+40);
-            circles[tmp].setRadius(50);
+            circles[tmp].setPosition((float) i * 150+30, (float) j * 150+30);
+            circles[tmp].setRadius(45);
             circles[tmp].setFillColor(sf::Color(255, 255, 255, 0));
         }
     }

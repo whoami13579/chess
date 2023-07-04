@@ -39,8 +39,8 @@ Board::Board(sf::Color c1, sf::Color c2)
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             tmp = (i * 8) + j;
-            squares[tmp].setPosition((float) i * 187.5f, (float) j * 187.5f);
-            squares[tmp].setSize(sf::Vector2f(187.5f, 187.5f));
+            squares[tmp].setPosition(i * 150, j * 150);
+            squares[tmp].setSize(sf::Vector2f((float)150, (float)150));
             squares[tmp].setFillColor((color ? c1 : c2));
 
             color = !color;

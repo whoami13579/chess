@@ -5,7 +5,7 @@
 int main() {
     ChessGame chessGame(sf::Color(0xf3bc7aff), sf::Color(0xae722bff));
 
-    sf::RenderWindow window(sf::VideoMode(2000, 1500), "chess", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(1700, 1200), "chess", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
     sf::Event event = sf::Event();
 
@@ -18,10 +18,10 @@ int main() {
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1500) && (0 < event.mouseButton.y) &&
-                        (event.mouseButton.y < 1500)) {
-                        chessGame.test(event, window, int (event.mouseButton.y/187.5), int (event.mouseButton.x/187.5));
-                    } else if ((1500 < event.mouseButton.x) && (event.mouseButton.x < 2000) &&
+                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
+                        (event.mouseButton.y < 1200)) {
+                        chessGame.test(event, window, int (event.mouseButton.y/150), int (event.mouseButton.x/150));
+                    } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
                                (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
                         chessGame.restart();
                     }
