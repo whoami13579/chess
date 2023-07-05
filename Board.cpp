@@ -6,33 +6,33 @@
 
 Board::Board(sf::Color c1, sf::Color c2)
         : c1(c1), c2(c2) {
-    chessBoard[0] = 'r';
-    chessBoard[1] = 'n';
-    chessBoard[2] = 'b';
-    chessBoard[3] = 'q';
-    chessBoard[4] = 'k';
-    chessBoard[5] = 'b';
-    chessBoard[6] = 'n';
-    chessBoard[7] = 'r';
+    bitBoard[0] = 'r';
+    bitBoard[1] = 'n';
+    bitBoard[2] = 'b';
+    bitBoard[3] = 'q';
+    bitBoard[4] = 'k';
+    bitBoard[5] = 'b';
+    bitBoard[6] = 'n';
+    bitBoard[7] = 'r';
     for(int i = 8; i < 16; i++) {
-        chessBoard[i] = 'p';
+        bitBoard[i] = 'p';
     }
 
     for(int i = 16; i < 48; i++) {
-        chessBoard[i] = ' ';
+        bitBoard[i] = ' ';
     }
 
     for(int i = 48; i < 56; i++) {
-        chessBoard[i] = 'P';
+        bitBoard[i] = 'P';
     }
-    chessBoard[56] = 'R';
-    chessBoard[57] = 'N';
-    chessBoard[58] = 'B';
-    chessBoard[59] = 'Q';
-    chessBoard[60] = 'K';
-    chessBoard[61] = 'B';
-    chessBoard[62] = 'N';
-    chessBoard[63] = 'R';
+    bitBoard[56] = 'R';
+    bitBoard[57] = 'N';
+    bitBoard[58] = 'B';
+    bitBoard[59] = 'Q';
+    bitBoard[60] = 'K';
+    bitBoard[61] = 'B';
+    bitBoard[62] = 'N';
+    bitBoard[63] = 'R';
 
     int tmp;
     bool color = true;
@@ -54,33 +54,33 @@ void Board::setColor(int row, int col) {
 }
 
 void Board::reset() {
-    chessBoard[0] = 'r';
-    chessBoard[1] = 'n';
-    chessBoard[2] = 'b';
-    chessBoard[3] = 'q';
-    chessBoard[4] = 'k';
-    chessBoard[5] = 'b';
-    chessBoard[6] = 'n';
-    chessBoard[7] = 'r';
+    bitBoard[0] = 'r';
+    bitBoard[1] = 'n';
+    bitBoard[2] = 'b';
+    bitBoard[3] = 'q';
+    bitBoard[4] = 'k';
+    bitBoard[5] = 'b';
+    bitBoard[6] = 'n';
+    bitBoard[7] = 'r';
     for(int i = 8; i < 16; i++) {
-        chessBoard[i] = 'p';
+        bitBoard[i] = 'p';
     }
 
     for(int i = 16; i < 48; i++) {
-        chessBoard[i] = ' ';
+        bitBoard[i] = ' ';
     }
 
     for(int i = 48; i < 56; i++) {
-        chessBoard[i] = 'P';
+        bitBoard[i] = 'P';
     }
-    chessBoard[56] = 'R';
-    chessBoard[57] = 'N';
-    chessBoard[58] = 'B';
-    chessBoard[59] = 'Q';
-    chessBoard[60] = 'K';
-    chessBoard[61] = 'B';
-    chessBoard[62] = 'N';
-    chessBoard[63] = 'R';
+    bitBoard[56] = 'R';
+    bitBoard[57] = 'N';
+    bitBoard[58] = 'B';
+    bitBoard[59] = 'Q';
+    bitBoard[60] = 'K';
+    bitBoard[61] = 'B';
+    bitBoard[62] = 'N';
+    bitBoard[63] = 'R';
 
     bool color = true;
     for (int i = 0; i < 64; i++) {

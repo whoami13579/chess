@@ -22,13 +22,13 @@ ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     restartText.setFillColor(sf::Color::Black);
     restartText.setPosition(restartButton.getPosition().x + 180.f, restartButton.getPosition().y + 10.f);
 
-    createMaterials();
+    createPieces();
     restart();
 }
 
 void ChessGame::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(board);
-    drawMaterial(target, states);
+    drawPieces(target, states);
     target.draw(legalMove);
     target.draw(restartButton);
     target.draw(restartText);
@@ -79,24 +79,21 @@ void ChessGame::restart() {
 }
 
 void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int col) {
+    if((!turn) && ('A' <= board.bitBoard[row*8 + col] && board.bitBoard[row*8 + col] <= 'Z')) {
+        return;
+    }
+    if((turn) && ('a' <= board.bitBoard[row*8 + col] && board.bitBoard[row*8 + col] <= 'z')) {
+        return;
+    }
     int i;
     for(i = 0; i < 32; i++) {
-        if(row == pieces[i].getPosition().at(0) && col == pieces[i].getPosition().at(1)) {
-            std::cout << pieces[i].getType() << std::endl;
+        if(row == pieces[i].getRow() && col == pieces[i].getCol()) {
             break;
         }
     }
-    if((i == 31) && (row != pieces[i].getPosition().at(0) || col != pieces[0].getPosition().at(0))) {
-        std::cout << "line 90" << std::endl;
+    if((i == 31) && (row != pieces[i].getRow() || col != pieces[0].getCol())) {
         return;
     }
-    if(!turn && 'A'<= pieces[i].getType() && pieces[i].getType() <= 'Z') {
-        return;
-    }
-    else if(turn && 'a' <= pieces[i].getType() && pieces[i].getType() <= 'z') {
-        return;
-    }
-    std::cout << "line 99" << std::endl;
 
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -109,10 +106,9 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
                     if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
                         (event.mouseButton.y < 1200)) {
 //                        legalMove.setMove(row, col);
-                        if(board.chessBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
+                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
                         pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
                         turn = !turn;
-                        std::cout << "line 110" << std::endl;
                         return;
                     } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
                                (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
@@ -120,27 +116,24 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
                         return;
                     }
                 } else if (event.mouseButton.button == sf::Mouse::Right) {
-                    std::cout << "line 116" << std::endl;
                     return;
                 }
                 else {
-                    std::cout << "line 120" << std::endl;
                     return;
                 }
             }
         }
     }
 
-//    turn = !turn;
 }
 
-void ChessGame::drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const {
+void ChessGame::drawPieces(sf::RenderTarget &target, sf::RenderStates states) const {
     for(int i = 0; i < 32; i++) {
         pieces[i].draw(target, states);
     }
 }
 
-void ChessGame::createMaterials() {
+void ChessGame::createPieces() {
     pieces[0] = Piece('K');
     pieces[1] = Piece('k');
     pieces[2] = Piece('Q');

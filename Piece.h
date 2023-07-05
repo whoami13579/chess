@@ -6,7 +6,6 @@
 #define CHESS_PIECE_H
 
 #include "PieceTexture.h"
-#include <vector>
 
 class Piece : public sf::Drawable{
 public:
@@ -14,13 +13,15 @@ public:
     Piece(char type);
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
     virtual void setPosition(int row, int col);
-    std::vector<int> getPosition();
+    short getRow();
+    short getCol();
     char getType();
+    bool selected = false;
 
 private:
     sf::Sprite sprite;
     char type;
-    bool d = true; // whether to draw
+    bool taken = false;
     short row, col;
 
 };

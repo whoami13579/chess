@@ -22,14 +22,14 @@ private:
     sf::Text restartText; //This is just the text displaied in the white area.
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
-    void drawMaterial(sf::RenderTarget &target, sf::RenderStates states) const;
+    void drawPieces(sf::RenderTarget &target, sf::RenderStates states) const;
 
 public:
     ChessGame(sf::Color c1, sf::Color c2);
     void test(sf::Event &event, sf::RenderWindow &window, int row, int col);
 
     void restart();
-    void createMaterials();
+    void createPieces();
     bool turn = true; // white : true, black false
 };
 

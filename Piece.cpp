@@ -54,7 +54,7 @@ Piece::Piece(char type) {
 }
 
 void Piece::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-    if(d) {
+    if(!taken) {
         target.draw(sprite);
     }
 }
@@ -67,8 +67,12 @@ void Piece::setPosition(int row, int col)
     sprite.setPosition(sf::Vector2f((float)col*150 + 150/2, (float)row*150 + 150/2));
 }
 
-std::vector<int> Piece::getPosition() {
-    return {row, col};
+short Piece::getRow() {
+    return row;
+}
+
+short Piece::getCol() {
+    return col;
 }
 
 char Piece::getType() {
