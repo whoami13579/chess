@@ -16,7 +16,6 @@ public:
     short getRow();
     short getCol();
     char getType();
-    bool selected = false;
 
 private:
     sf::Sprite sprite;

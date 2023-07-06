@@ -78,7 +78,7 @@ void ChessGame::restart() {
     turn = true;
 }
 
-void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int col) {
+void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int col) {
     if((!turn) && ('A' <= board.bitBoard[row*8 + col] && board.bitBoard[row*8 + col] <= 'Z')) {
         return;
     }
@@ -106,7 +106,7 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
                     if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
                         (event.mouseButton.y < 1200)) {
 //                        legalMove.setMove(row, col);
-                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
+//                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
                         pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
                         turn = !turn;
                         return;
@@ -128,9 +128,13 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
 }
 
 void ChessGame::drawPieces(sf::RenderTarget &target, sf::RenderStates states) const {
-    for(int i = 0; i < 32; i++) {
-        pieces[i].draw(target, states);
+    for(auto &piece : pieces) {
+        piece.draw(target, states);
     }
+
+//    for(int i = 0; i < 32; i++) {
+//        pieces[i].draw(target, states);
+//    }
 }
 
 void ChessGame::createPieces() {

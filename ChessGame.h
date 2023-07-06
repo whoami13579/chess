@@ -11,6 +11,14 @@
 #include "Piece.h"
 
 class ChessGame : public sf::Drawable {
+public:
+    ChessGame(sf::Color c1, sf::Color c2);
+    void select(sf::Event &event, sf::RenderWindow &window, int row, int col);
+
+    void restart();
+    void createPieces();
+    bool turn = true; // white : true, black false
+
 private:
     Board board;
     LegalMove legalMove;
@@ -23,14 +31,7 @@ private:
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
     void drawPieces(sf::RenderTarget &target, sf::RenderStates states) const;
-
-public:
-    ChessGame(sf::Color c1, sf::Color c2);
-    void test(sf::Event &event, sf::RenderWindow &window, int row, int col);
-
-    void restart();
-    void createPieces();
-    bool turn = true; // white : true, black false
+    void move();
 };
 
 
