@@ -16,14 +16,16 @@ public:
     short getRow();
     short getCol();
     char getType();
-    bool selected = false;
+
+protected:
+    bool taken = false;
 
 private:
     sf::Sprite sprite;
     char type;
-    bool taken = false;
     short row, col;
 
+    friend class ChessGame;
 };
 
 

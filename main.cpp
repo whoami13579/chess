@@ -10,7 +10,6 @@ int main() {
     sf::Event event = sf::Event();
 
     while (window.isOpen()) {
-
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -20,7 +19,7 @@ int main() {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
                         (event.mouseButton.y < 1200)) {
-                        chessGame.test(event, window, int (event.mouseButton.y/150), int (event.mouseButton.x/150));
+                        chessGame.select(event, window, int(event.mouseButton.y / 150), int(event.mouseButton.x / 150));
                     } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
                                (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
                         chessGame.restart();

@@ -78,7 +78,7 @@ void ChessGame::restart() {
     turn = true;
 }
 
-void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int col) {
+void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int col) {
     if((!turn) && ('A' <= board.bitBoard[row*8 + col] && board.bitBoard[row*8 + col] <= 'Z')) {
         return;
     }
@@ -94,6 +94,7 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
     if((i == 31) && (row != pieces[i].getRow() || col != pieces[0].getCol())) {
         return;
     }
+    int x, y;
 
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -103,15 +104,18 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
 
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
-                    if ((0 < event.mouseButton.x) && (event.mouseButton.x < 1200) && (0 < event.mouseButton.y) &&
-                        (event.mouseButton.y < 1200)) {
+                    x = event.mouseButton.x;
+                    y = event.mouseButton.y;
+                    if ((0 < x) && (x < 1200) && (0 < y) &&
+                        (y < 1200)) {
 //                        legalMove.setMove(row, col);
-                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
-                        pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
-                        turn = !turn;
+//                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
+                        // pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
+                        // turn = !turn;
+                        move(row, col, (int)(y/150), (int)(x/150));
                         return;
-                    } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
-                               (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
+                    } else if ((1200 < x) && (x < 1700) &&
+                               (0 < y) && (y < 50)) {
                         restart();
                         return;
                     }
@@ -128,9 +132,13 @@ void ChessGame::test(sf::Event &event, sf::RenderWindow &window, int row, int co
 }
 
 void ChessGame::drawPieces(sf::RenderTarget &target, sf::RenderStates states) const {
-    for(int i = 0; i < 32; i++) {
-        pieces[i].draw(target, states);
-    }
+    // for(auto &piece : pieces) {
+    //     piece.draw(target, states);
+    // }
+
+   for(int i = 0; i < 32; i++) {
+       pieces[i].draw(target, states);
+   }
 }
 
 void ChessGame::createPieces() {
@@ -157,4 +165,36 @@ void ChessGame::createPieces() {
     for(int i = 24; i < 32; i++) {
         pieces[i] = Piece('p');
     }
+}
+
+void ChessGame::move(int frow, int fcol, int trow, int tcol) {
+    if(turn && 'A' <= board.bitBoard[trow*8 + tcol] && board.bitBoard[trow*8 + tcol] <= 'Z') {
+        return;
+    }
+    if(!turn && 'a' <= board.bitBoard[trow*8 + tcol] && board.bitBoard[trow*8 + tcol] <= 'z') {
+        return;
+    }
+
+    if(Piece *p = findPiece(trow, tcol)) {
+        p->taken = true;
+    }
+
+    if(Piece *p = findPiece(frow, fcol)) {
+        p->setPosition(trow, tcol);
+    }
+
+    board.bitBoard[trow*8 + tcol] = board.bitBoard[frow*8 + fcol];
+    board.bitBoard[frow*8 + fcol] = ' ';
+
+    turn = !turn;
+}
+
+Piece *ChessGame::findPiece(int row, int col) {
+    for(int i = 0; i < 32; i++) {
+        if(pieces[i].getRow() == row && pieces[i].getCol() == col) {
+            return pieces+i;
+        }
+    }
+
+    return nullptr;
 }
