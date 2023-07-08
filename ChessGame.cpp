@@ -107,8 +107,9 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
                         (event.mouseButton.y < 1200)) {
 //                        legalMove.setMove(row, col);
 //                        if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
-                        pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
-                        turn = !turn;
+                        // pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
+                        // turn = !turn;
+                        move(row, col, (int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
                         return;
                     } else if ((1200 < event.mouseButton.x) && (event.mouseButton.x < 1700) &&
                                (0 < event.mouseButton.y) && (event.mouseButton.y < 50)) {
@@ -161,4 +162,37 @@ void ChessGame::createPieces() {
     for(int i = 24; i < 32; i++) {
         pieces[i] = Piece('p');
     }
+}
+
+void ChessGame::move(int frow, int fcol, int trow, int tcol) {
+    if(turn && 'A' <= board.bitBoard[trow*8 + tcol] && board.bitBoard[trow*8 + tcol] <= 'Z') {
+        return;
+    }
+    if(!turn && 'a' <= board.bitBoard[trow*8 + tcol] && board.bitBoard[trow*8 + tcol] <= 'z') {
+        return;
+    }
+
+    if(auto *p = findPiece(frow, fcol)) {
+        p->setPosition(trow, tcol);
+    std::cout << "ChessGame.cpp line 177" << std::endl;
+    }
+
+    if(auto *p = findPiece(trow, fcol)) {
+        p->taken = true;
+    }
+
+    board.bitBoard[trow*8 + tcol] = board.bitBoard[frow*8 + fcol];
+    board.bitBoard[frow*8 + fcol] = ' ';
+
+    turn = !turn;
+}
+
+Piece *ChessGame::findPiece(int row, int col) {
+    for(auto i : pieces) {
+        if(i.getRow() == row && i.getCol() == col) {
+            return &i;
+        }
+    }
+
+    return nullptr;
 }
