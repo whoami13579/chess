@@ -2,7 +2,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-
 int main() {
     ChessGame chessGame(sf::Color(0xf3bc7aff), sf::Color(0xae722bff));
 
