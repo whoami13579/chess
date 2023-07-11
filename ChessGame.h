@@ -32,6 +32,7 @@ private:
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
     void drawPieces(sf::RenderTarget &target, sf::RenderStates states) const;
     void move(int frow, int fcol, int trow, int tcol); //frow : from which row, fcol : from which col, trow : to which row, tcol : to which col
+    void generate_moves(int row, int col);
     Piece *findPiece(int row, int col);
 };
 
