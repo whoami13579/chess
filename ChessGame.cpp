@@ -75,8 +75,9 @@ void ChessGame::restart() {
         pieces[i + 24].setPosition(1, i);
     }
 
-    for(int i = 0; i < 32; i++) {
+    for (int i = 0; i < 32; i++) {
         pieces[i].taken = false;
+        pieces[i].moved = false;
     }
 
     turn = true;
@@ -89,9 +90,12 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
     if ((turn) && ('a' <= board.bitBoard[row * 8 + col] && board.bitBoard[row * 8 + col] <= 'z')) {
         return;
     }
-    if(board.bitBoard[row*8 + col] == ' ') {
+    if (board.bitBoard[row * 8 + col] == ' ') {
         return;
     }
+    generate_moves(row, col);
+    window.draw(*this);
+    window.display();
     // int i;
     // for (i = 0; i < 32; i++) {
     //     if (row == pieces[i].getRow() && col == pieces[i].getCol()) {
@@ -114,10 +118,11 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
                     x = event.mouseButton.x;
                     y = event.mouseButton.y;
                     if ((0 < x) && (x < 1200) && (0 < y) && (y < 1200)) {
-                        // legalMove.setMove(row, col);
-                        // if(board.bitBoard[(int (event.mouseButton.y/150)*8) + int (event.mouseButton.x/150)])
-                        // pieces[i].setPosition((int)(event.mouseButton.y/150), (int)(event.mouseButton.x/150));
-                        // turn = !turn;
+                        if(x/150 == col && y/150 == row) {
+                            legalMove.reset();
+                            return;
+                        }
+
                         move(row, col, (int) (y / 150), (int) (x / 150));
                         return;
                     } else if ((1200 < x) && (x < 1700) &&
@@ -174,9 +179,11 @@ void ChessGame::createPieces() {
 
 void ChessGame::move(int frow, int fcol, int trow, int tcol) {
     if (turn && 'A' <= board.bitBoard[trow * 8 + tcol] && board.bitBoard[trow * 8 + tcol] <= 'Z') {
+        legalMove.reset();
         return;
     }
     if (!turn && 'a' <= board.bitBoard[trow * 8 + tcol] && board.bitBoard[trow * 8 + tcol] <= 'z') {
+        legalMove.reset();
         return;
     }
 
@@ -186,6 +193,8 @@ void ChessGame::move(int frow, int fcol, int trow, int tcol) {
 
     if (Piece *p = findPiece(frow, fcol)) {
         p->setPosition(trow, tcol);
+        p->moved = true;
+        legalMove.reset();
     }
 
     board.bitBoard[trow * 8 + tcol] = board.bitBoard[frow * 8 + fcol];
@@ -202,4 +211,26 @@ Piece *ChessGame::findPiece(int row, int col) {
     }
 
     return nullptr;
+}
+
+void ChessGame::generate_moves(int row, int col) {
+    switch (board.bitBoard[row * 8 + col]) {
+        case 'P':
+            if (row == 6) {
+                legalMove.setMove(row - 1, col);
+                legalMove.setMove(row - 2, col);
+            } else {
+                legalMove.setMove(row - 1, col);
+            }
+            break;
+
+        case 'p':
+            if (row == 1) {
+                legalMove.setMove(row + 1, col);
+                legalMove.setMove(row + 2, col);
+            } else {
+                legalMove.setMove(row + 1, col);
+            }
+            break;
+    }
 }

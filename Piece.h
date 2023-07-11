@@ -19,6 +19,7 @@ public:
 
 protected:
     bool taken = false;
+    bool moved = false;
 
 private:
     sf::Sprite sprite;
