@@ -14,6 +14,9 @@ public:
     void setMove(int row, int col);
     void reset();
 
+protected:
+    bool bitBoard[64];
+
 private:
     sf::CircleShape circles[64];
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;

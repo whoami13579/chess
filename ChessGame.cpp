@@ -42,7 +42,7 @@ void ChessGame::restart() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             tmp = (i * 8) + j;
-            board.squares[tmp].setPosition(i * 150, j * 150);
+            board.squares[tmp].setPosition(float(i * 150), float(j * 150));
             board.squares[tmp].setSize(sf::Vector2f((float) 150, (float) 150));
             board.squares[tmp].setFillColor((color ? board.c1 : board.c2));
 
@@ -123,10 +123,15 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
                             return;
                         }
 
+                        if(legalMove.bitBoard[(y/150)*8 + (x/150)] == false) {
+                            legalMove.reset();
+                            return;
+                        }
+
+
                         move(row, col, (int) (y / 150), (int) (x / 150));
                         return;
-                    } else if ((1200 < x) && (x < 1700) &&
-                               (0 < y) && (y < 50)) {
+                    } else if ((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
                         restart();
                         return;
                     }
@@ -216,20 +221,72 @@ Piece *ChessGame::findPiece(int row, int col) {
 void ChessGame::generate_moves(int row, int col) {
     switch (board.bitBoard[row * 8 + col]) {
         case 'P':
-            if (row == 6) {
+            if (row == 6 && board.bitBoard[(row-1)*8 + col] == ' ' && board.bitBoard[(row-2)*8 + col] == ' ') {
                 legalMove.setMove(row - 1, col);
                 legalMove.setMove(row - 2, col);
-            } else {
+                legalMove.bitBoard[(row-1)*8 + col] = true;
+                legalMove.bitBoard[(row-2)*8 + col] = true;
+            }
+            if(row <= 6 && board.bitBoard[(row-1)*8 + col]) {
                 legalMove.setMove(row - 1, col);
+                legalMove.bitBoard[(row-1)*8 + col] = true;
+            }
+            if(0 < col && col < 7) {
+                if('a' <= board.bitBoard[(row-1) * 8 + col - 1] && board.bitBoard[(row-1) * 8 + col - 1] <= 'z') {
+                    legalMove.setMove(row-1, col-1);
+                    legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                }
+                if('a' <= board.bitBoard[(row-1) * 8 + col + 1] && board.bitBoard[(row-1) * 8 + col + 1] <= 'z') {
+                    legalMove.setMove(row-1, col+1);
+                    legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                }
+            }
+            if(col == 0) {
+                if('a' <= board.bitBoard[(row-1) * 8 + col + 1] && board.bitBoard[(row-1) * 8 + col + 1] <= 'z') {
+                    legalMove.setMove(row-1, col+1);
+                    legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                }
+            }
+            if(col == 7) {
+                if('a' <= board.bitBoard[(row-1) * 8 + col - 1] && board.bitBoard[(row-1) * 8 + col - 1] <= 'z') {
+                    legalMove.setMove(row-1, col-1);
+                    legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                }
             }
             break;
 
         case 'p':
-            if (row == 1) {
+            if (row == 1 && board.bitBoard[(row+1)*8 + col] == ' ' && board.bitBoard[(row+2)*8 + col] == ' ') {
                 legalMove.setMove(row + 1, col);
                 legalMove.setMove(row + 2, col);
-            } else {
+                legalMove.bitBoard[(row+1) * 8 + col] = true;
+                legalMove.bitBoard[(row+2) * 8 + col] = true;
+            }
+            if(row >= 1 && board.bitBoard[(row+1)*8 + col] == ' '){
                 legalMove.setMove(row + 1, col);
+                legalMove.bitBoard[(row+1) * 8 + col] = true;
+            }
+            if(0 < col && col < 7) {
+                if('A' <= board.bitBoard[(row+1) * 8 + col - 1] && board.bitBoard[(row+1) * 8 + col - 1] <= 'Z') {
+                    legalMove.setMove(row+1, col-1);
+                    legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                }
+                if('A' <= board.bitBoard[(row+1) * 8 + col + 1] && board.bitBoard[(row+1) * 8 + col + 1] <= 'Z') {
+                    legalMove.setMove(row+1, col+1);
+                    legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                }
+            }
+            if(col == 0) {
+                if('A' <= board.bitBoard[(row+1) * 8 + col + 1] && board.bitBoard[(row+1) * 8 + col + 1] <= 'Z') {
+                    legalMove.setMove(row+1, col+1);
+                    legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                }
+            }
+            if(col == 7) {
+                if('A' <= board.bitBoard[(row+1) * 8 + col - 1] && board.bitBoard[(row+1) * 8 + col - 1] <= 'Z') {
+                    legalMove.setMove(row+1, col-1);
+                    legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                }
             }
             break;
     }
