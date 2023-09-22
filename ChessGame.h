@@ -6,6 +6,7 @@
 #define CHESS_CHESSGAME_H
 
 #include <iostream>
+#include <string>
 #include "Board.h"
 #include "LegalMove.h"
 #include "Piece.h"
@@ -34,6 +35,12 @@ private:
     void move(int frow, int fcol, int trow, int tcol); //frow : from which row, fcol : from which col, trow : to which row, tcol : to which col
     void generate_moves(int row, int col);
     Piece *findPiece(int row, int col);
+    bool isCheck(const std::string &bitboard);
+    bool wCastleK = true;
+    bool wCastleQ = true;
+    bool bCastleK = true;
+    bool bCastleQ = true;
+    std::string fromAtoB(int frow, int fcol, int trow, int tcol);
 };
 
 

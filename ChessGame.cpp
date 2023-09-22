@@ -3,6 +3,7 @@
 //
 
 #include "ChessGame.h"
+#include <iostream>
 
 ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     board = Board(c1, c2);
@@ -37,6 +38,8 @@ void ChessGame::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 void ChessGame::restart() {
     board.reset();
     legalMove.reset();
+
+    // draw the light squares and the dark squares
     int tmp;
     bool color = true;
     for (int i = 0; i < 8; i++) {
@@ -51,7 +54,7 @@ void ChessGame::restart() {
         color = !color;
     }
 
-
+    // set each piece's position
     pieces[0].setPosition(7, 4);
     pieces[1].setPosition(0, 4);
     pieces[2].setPosition(7, 3);
@@ -80,22 +83,31 @@ void ChessGame::restart() {
         pieces[i].moved = false;
     }
 
+    // the first turn is whte's turn
     turn = true;
 }
 
 void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int col) {
+    // the user selects white piece on black's turn, return
     if ((!turn) && ('A' <= board.bitBoard[row * 8 + col] && board.bitBoard[row * 8 + col] <= 'Z')) {
         return;
     }
+
+    // the user selects black piece on white's turn, return
     if ((turn) && ('a' <= board.bitBoard[row * 8 + col] && board.bitBoard[row * 8 + col] <= 'z')) {
         return;
     }
+
+    // if user selects no piece, return
     if (board.bitBoard[row * 8 + col] == ' ') {
         return;
     }
+
+    // generate the legal movies and draw the game
     generate_moves(row, col);
     window.draw(*this);
     window.display();
+
     // int i;
     // for (i = 0; i < 32; i++) {
     //     if (row == pieces[i].getRow() && col == pieces[i].getCol()) {
@@ -105,7 +117,8 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
     // if ((i == 31) && (row != pieces[i].getRow() || col != pieces[0].getCol())) {
     //     return;
     // }
-    int x, y;
+
+    int x, y; // the position of mouse click
 
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -118,11 +131,13 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
                     x = event.mouseButton.x;
                     y = event.mouseButton.y;
                     if ((0 < x) && (x < 1200) && (0 < y) && (y < 1200)) {
+                        // if the user clicks the same piece, return
                         if(x/150 == col && y/150 == row) {
                             legalMove.reset();
                             return;
                         }
 
+                        // if the square the user clicks is not an legal move, return
                         if(legalMove.bitBoard[(y/150)*8 + (x/150)] == false) {
                             legalMove.reset();
                             return;
@@ -147,13 +162,13 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
 }
 
 void ChessGame::drawPieces(sf::RenderTarget &target, sf::RenderStates states) const {
-    // for(auto &piece : pieces) {
-    //     piece.draw(target, states);
-    // }
-
-    for (int i = 0; i < 32; i++) {
-        pieces[i].draw(target, states);
+    for(auto &piece : pieces) {
+        piece.draw(target, states);
     }
+
+    // for (int i = 0; i < 32; i++) {
+    //     pieces[i].draw(target, states);
+    // }
 }
 
 void ChessGame::createPieces() {
@@ -223,70 +238,98 @@ void ChessGame::generate_moves(int row, int col) {
     switch (board.bitBoard[row * 8 + col]) {
         case 'P':
             if (row == 6 && board.bitBoard[(row-1)*8 + col] == ' ' && board.bitBoard[(row-2)*8 + col] == ' ') {
-                legalMove.setMove(row - 1, col);
-                legalMove.setMove(row - 2, col);
-                legalMove.bitBoard[(row-1)*8 + col] = true;
-                legalMove.bitBoard[(row-2)*8 + col] = true;
+                if(!isCheck(fromAtoB(row, col, row-1, col))) {
+                    legalMove.setMove(row - 1, col);
+                    legalMove.bitBoard[(row-1)*8 + col] = true;
+                }
+                if(!isCheck(fromAtoB(row, col, row - 2, col))) {
+                    legalMove.setMove(row - 2, col);
+                    legalMove.bitBoard[(row-2)*8 + col] = true;
+                }
             }
-            if(row <= 6 && board.bitBoard[(row-1)*8 + col]) {
-                legalMove.setMove(row - 1, col);
-                legalMove.bitBoard[(row-1)*8 + col] = true;
+            if(row <= 6 && board.bitBoard[(row-1)*8 + col] == ' ') {
+                if(!isCheck(fromAtoB(row, col, row - 1, col))) {
+                    legalMove.setMove(row - 1, col);
+                    legalMove.bitBoard[(row-1)*8 + col] = true;
+                }
             }
             if(0 < col && col < 7) {
                 if('a' <= board.bitBoard[(row-1) * 8 + col - 1] && board.bitBoard[(row-1) * 8 + col - 1] <= 'z') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                    }
                 }
                 if('a' <= board.bitBoard[(row-1) * 8 + col + 1] && board.bitBoard[(row-1) * 8 + col + 1] <= 'z') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                    }
                 }
             }
             if(col == 0) {
                 if('a' <= board.bitBoard[(row-1) * 8 + col + 1] && board.bitBoard[(row-1) * 8 + col + 1] <= 'z') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[(row-1)*8 + col + 1] = true;
+                    }
                 }
             }
             if(col == 7) {
                 if('a' <= board.bitBoard[(row-1) * 8 + col - 1] && board.bitBoard[(row-1) * 8 + col - 1] <= 'z') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[(row-1)*8 + col - 1] = true;
+                    }
                 }
             }
             break;
 
         case 'p':
             if (row == 1 && board.bitBoard[(row+1)*8 + col] == ' ' && board.bitBoard[(row+2)*8 + col] == ' ') {
-                legalMove.setMove(row + 1, col);
-                legalMove.setMove(row + 2, col);
-                legalMove.bitBoard[(row+1) * 8 + col] = true;
-                legalMove.bitBoard[(row+2) * 8 + col] = true;
+                if(!isCheck(fromAtoB(row, col, row + 1, col))) {
+                    legalMove.setMove(row + 1, col);
+                    legalMove.bitBoard[(row+1) * 8 + col] = true;
+                }
+                if(!isCheck(fromAtoB(row, col, row + 2, col))) {
+                    legalMove.setMove(row + 2, col);
+                    legalMove.bitBoard[(row+2) * 8 + col] = true;
+                }
             }
             if(row >= 1 && board.bitBoard[(row+1)*8 + col] == ' '){
-                legalMove.setMove(row + 1, col);
-                legalMove.bitBoard[(row+1) * 8 + col] = true;
+                if(!isCheck(fromAtoB(row, col, row + 1 , col))) {
+                    legalMove.setMove(row + 1, col);
+                    legalMove.bitBoard[(row+1) * 8 + col] = true;
+                }
             }
             if(0 < col && col < 7) {
                 if('A' <= board.bitBoard[(row+1) * 8 + col - 1] && board.bitBoard[(row+1) * 8 + col - 1] <= 'Z') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                    }
                 }
                 if('A' <= board.bitBoard[(row+1) * 8 + col + 1] && board.bitBoard[(row+1) * 8 + col + 1] <= 'Z') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                    }
                 }
             }
             if(col == 0) {
                 if('A' <= board.bitBoard[(row+1) * 8 + col + 1] && board.bitBoard[(row+1) * 8 + col + 1] <= 'Z') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[(row+1)*8 + col+1] = true;
+                    }
                 }
             }
             if(col == 7) {
                 if('A' <= board.bitBoard[(row+1) * 8 + col - 1] && board.bitBoard[(row+1) * 8 + col - 1] <= 'Z') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[(row+1)*8 + col-1] = true;
+                    }
                 }
             }
             break;
@@ -298,8 +341,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -309,8 +354,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             y = -1;
@@ -318,8 +365,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -329,8 +378,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = 1;
@@ -338,8 +389,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -349,8 +402,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = -1;
@@ -358,8 +413,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -369,8 +426,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
             break;
 
@@ -381,8 +440,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -392,8 +453,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             y = -1;
@@ -401,8 +464,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -412,8 +477,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = 1;
@@ -421,8 +488,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -432,8 +501,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = -1;
@@ -441,8 +512,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -452,8 +525,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
             break;
 
@@ -461,193 +536,257 @@ void ChessGame::generate_moves(int row, int col) {
             tmp = (row-1)*8 + col;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col))) {
+                        legalMove.setMove(row-1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row-1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col))) {
+                        legalMove.setMove(row-1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row-1)*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = row*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col + 1))) {
+                        legalMove.setMove(row, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col + 1))) {
+                        legalMove.setMove(row, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row+1)*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row+1)*8 + col;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col))) {
+                        legalMove.setMove(row+1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col))) {
+                        legalMove.setMove(row+1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row+1)*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = row*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col - 1))) {
+                        legalMove.setMove(row, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col - 1))) {
+                        legalMove.setMove(row, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row-1)*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
         case 'k':
             tmp = (row-1)*8 + col;
-            if(0 <= tmp && tmp <= 63) {
+            if(0 <= row - 1 && 0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col))) {
+                        legalMove.setMove(row-1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row-1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col))) {
+                        legalMove.setMove(row-1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row-1)*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row-1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col + 1))) {
+                        legalMove.setMove(row-1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = row*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col + 1))) {
+                        legalMove.setMove(row, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col + 1))) {
+                        legalMove.setMove(row, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
-            }
+            } 
 
             tmp = (row+1)*8 + col+1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+1, col+1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col + 1))) {
+                        legalMove.setMove(row+1, col+1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row+1)*8 + col;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col))) {
+                        legalMove.setMove(row+1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+1, col);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col))) {
+                        legalMove.setMove(row+1, col);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row+1)*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + 1, col - 1))) {
+                        legalMove.setMove(row+1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = row*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col - 1))) {
+                        legalMove.setMove(row, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row, col - 1))) {
+                        legalMove.setMove(row, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
             tmp = (row-1)*8 + col-1;
             if(0 <= tmp && tmp <= 63) {
                 if(board.bitBoard[tmp] == ' ') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
                 else if('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row-1, col-1);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
+                        legalMove.setMove(row-1, col-1);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
@@ -658,8 +797,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -672,8 +813,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -683,8 +826,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -697,8 +842,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -708,8 +855,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -722,8 +871,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -733,8 +884,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -747,8 +900,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
@@ -759,8 +914,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -773,8 +930,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -784,8 +943,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -798,8 +959,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -809,8 +972,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -823,8 +988,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -834,8 +1001,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -848,8 +1017,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
@@ -861,8 +1032,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -872,8 +1045,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             y = -1;
@@ -881,8 +1056,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -892,8 +1069,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = 1;
@@ -901,8 +1080,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -912,8 +1093,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = -1;
@@ -921,8 +1104,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -932,18 +1117,22 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
-                        x = 1;
+            x = 1;
             y = 1;
             while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -956,8 +1145,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -967,8 +1158,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -981,8 +1174,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -992,8 +1187,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1006,8 +1203,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -1017,8 +1216,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1031,8 +1232,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
@@ -1043,8 +1246,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1054,17 +1259,21 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
-            }
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
+            } 
 
             y = -1;
             while(0 <= row+y && row+y <=7) {
                 tmp = (row+y)*8 + col;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                            legalMove.setMove(row+y, col);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1074,8 +1283,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = (row+y)*8 + col;
             if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row+y, col);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row + y, col))) {
+                    legalMove.setMove(row+y, col);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = 1;
@@ -1083,8 +1294,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1094,8 +1307,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = -1;
@@ -1103,8 +1318,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = row*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                            legalMove.setMove(row, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1114,8 +1331,10 @@ void ChessGame::generate_moves(int row, int col) {
             }
             tmp = row*8 + col+x;
             if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                legalMove.setMove(row, col+x);
-                legalMove.bitBoard[tmp] = true;
+                if(!isCheck(fromAtoB(row, col, row, col + x))) {
+                    legalMove.setMove(row, col+x);
+                    legalMove.bitBoard[tmp] = true;
+                }
             }
 
             x = 1;
@@ -1124,8 +1343,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1138,8 +1359,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -1149,8 +1372,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1163,8 +1388,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
 
@@ -1174,8 +1401,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1188,6 +1417,7 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x)))
                     legalMove.setMove(row+y, col+x);
                     legalMove.bitBoard[tmp] = true;
                 }
@@ -1199,8 +1429,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ') {
-                        legalMove.setMove(row+y, col+x);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                            legalMove.setMove(row+y, col+x);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                     else {
                         break;
@@ -1213,8 +1445,10 @@ void ChessGame::generate_moves(int row, int col) {
             if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                 tmp = (row+y)*8 + col+x;
                 if(0 <= tmp && tmp <= 63 && 'A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z') {
-                    legalMove.setMove(row+y, col+x);
-                    legalMove.bitBoard[tmp] = true;
+                    if(!isCheck(fromAtoB(row, col, row + y, col + x))) {
+                        legalMove.setMove(row+y, col+x);
+                        legalMove.bitBoard[tmp] = true;
+                    }
                 }
             }
             break;
@@ -1223,8 +1457,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-2)*8 + col+1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row-2, col+1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 2, col + 1))) {
+                            legalMove.setMove(row-2, col+1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1233,8 +1469,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-2)*8 + col-1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row-2, col-1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 2, col - 1))) {
+                            legalMove.setMove(row-2, col-1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1243,8 +1481,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+2)*8 + col+1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row+2, col+1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 2, col + 1))) {
+                            legalMove.setMove(row+2, col+1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1253,8 +1493,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+2)*8 + col-1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row+2, col-1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 2, col - 1))) {
+                            legalMove.setMove(row+2, col-1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1263,8 +1505,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+1)*8 + col+2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row+1, col+2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 1, col + 2))) {
+                            legalMove.setMove(row+1, col+2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1273,8 +1517,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-1)*8 + col+2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row-1, col+2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 1, col + 2))) {
+                            legalMove.setMove(row-1, col+2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1283,8 +1529,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+1)*8 + col-2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row+1, col-2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 1, col - 2))) {
+                            legalMove.setMove(row+1, col-2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1293,8 +1541,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-1)*8 + col-2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('a' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'z')) {
-                        legalMove.setMove(row-1, col-2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 1, col - 2))) {
+                            legalMove.setMove(row-1, col-2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1304,8 +1554,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-2)*8 + col+1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row-2, col+1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 2, col + 1))) {
+                            legalMove.setMove(row-2, col+1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1314,8 +1566,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-2)*8 + col-1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row-2, col-1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 2, col - 1))) {
+                            legalMove.setMove(row-2, col-1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1324,8 +1578,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+2)*8 + col+1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row+2, col+1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 2, col + 1))) {
+                            legalMove.setMove(row+2, col+1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1334,8 +1590,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+2)*8 + col-1;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row+2, col-1);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 2, col - 1))) {
+                            legalMove.setMove(row+2, col-1);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1344,8 +1602,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+1)*8 + col+2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row+1, col+2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 1, col + 2))) {
+                            legalMove.setMove(row+1, col+2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1354,8 +1614,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-1)*8 + col+2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row-1, col+2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 1, col + 2))) {
+                            legalMove.setMove(row-1, col+2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1364,8 +1626,10 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row+1)*8 + col-2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row+1, col-2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row + 1, col - 2))) {
+                            legalMove.setMove(row+1, col-2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
@@ -1374,11 +1638,1050 @@ void ChessGame::generate_moves(int row, int col) {
                 tmp = (row-1)*8 + col-2;
                 if(0 <= tmp && tmp <= 63) {
                     if(board.bitBoard[tmp] == ' ' || ('A' <= board.bitBoard[tmp] && board.bitBoard[tmp] <= 'Z')) {
-                        legalMove.setMove(row-1, col-2);
-                        legalMove.bitBoard[tmp] = true;
+                        if(!isCheck(fromAtoB(row, col, row - 1, col - 2))) {
+                            legalMove.setMove(row-1, col-2);
+                            legalMove.bitBoard[tmp] = true;
+                        }
                     }
                 }
             }
             break;
     }
+}
+
+bool ChessGame::isCheck(const std::string &bitboard) {;
+    int x = 0, y = 0, tmp;
+
+    if(turn) {
+        for(int row = 0; row < 8; row++) {
+            for(int col = 0; col < 8; col++) {
+                switch(bitboard[row * 8 + col]) {
+                    case 'p':
+                        tmp = (row + 1) * 8 + col + 1;
+                        if(row + 1 <= 7 && 0 <= tmp && tmp < 64 && bitboard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        tmp = (row + 1) * 8 + col - 1;
+                        if(row + 1 <= 7 && 0 <= tmp && tmp < 64 && bitboard[tmp] == 'K') {
+                            return true;
+                        }
+                        break;
+                    
+                    case 'r':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y++;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        y = -1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y--;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        x = 1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        x = -1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+                        break;
+                    
+                    case 'k':
+                        tmp = (row-1)*8 + col;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row-1)*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = row*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = row*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row-1)*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+                        break;
+
+                    case 'b':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = 1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+                        break;
+
+                    case 'q':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y++;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        y = -1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y--;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        x = 1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        x = -1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            return true;
+                        }
+
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = 1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                                return true;
+                            }
+                        }
+                        break;
+                    
+                    case 'n':
+                        if(0 <= row-2 && row-2 <= 7 && 0 <= col+1 && col+1 <= 7) {
+                            tmp = (row-2)*8 + col+1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-2 && row-2 <= 7 && 0 <= col-1 && col-1 <= 7) {
+                            tmp = (row-2)*8 + col-1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+2 && row+2 <= 7 && 0 <= col+1 && col+1 <= 7) {
+                            tmp = (row+2)*8 + col+1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+2 && row+2 <= 7 && 0 <= col-1 && col-1 <= 7) {
+                            tmp = (row+2)*8 + col-1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+1 && row+1 <= 7 && 0 <= col+2 && col+2 <= 7) {
+                            tmp = (row+1)*8 + col+2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-1 && row-1 <= 7 && 0 <= col+2 && col+2 <= 7) {
+                            tmp = (row-1)*8 + col+2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+1 && row+1 <= 7 && 0 <= col-2 && col-2 <= 7) {
+                            tmp = (row+1)*8 + col-2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-1 && row-1 <= 7 && 0 <= col-2 && col-2 <= 7) {
+                            tmp = (row-1)*8 + col-2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'K') {
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+    else {
+        for(int row = 0; row < 8; row++) {
+            for(int col = 0; col < 8; col++) {
+                switch(bitboard[row * 8 + col]) {
+                    case 'P':
+                        tmp = (row - 1) * 8 + col + 1;
+                        if(0 <= row - 1 && 0 <= tmp && tmp < 64 && bitboard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        tmp = (row - 1) * 8 + col - 1;
+                        if(row - 1 <= 7 && 0 <= tmp && tmp < 64 && bitboard[tmp] == 'k') {
+                            return true;
+                        }
+                        break;
+
+                    case 'R':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y++;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        y = -1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y--;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        x = 1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        x = -1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+                    break;
+
+                    case 'K':
+                        tmp = (row-1)*8 + col;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row-1)*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = row*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col+1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row+1)*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = row*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        tmp = (row-1)*8 + col-1;
+                        if(0 <= tmp && tmp <= 63) {
+                            if(board.bitBoard[tmp] == ' ') {
+                                ;
+                            }
+                            else if(board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+                        break;
+
+                    case 'B':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        x = 1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+                        break;
+
+                    case 'Q':
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y++;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        y = -1;
+                        while(0 <= row+y && row+y <=7) {
+                            tmp = (row+y)*8 + col;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            y--;
+                        }
+                        tmp = (row+y)*8 + col;
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        x = 1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        x = -1;
+                        while(0 <= col+x && col+x <=7) {
+                            tmp = row*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                        }
+                        tmp = row*8 + col+x;
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            return true;
+                        }
+
+                        x = 1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                std::cout << "check" << std::endl;
+                                return true;
+                            }
+                        }
+
+                        x = 1;
+                        y = -1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x++;
+                            y--;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+
+                        x = -1;
+                        y = 1;
+                        while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == ' ') {
+                                    ;
+                                }
+                                else {
+                                    break;
+                                }
+                            }
+                            x--;
+                            y++;
+                        }
+
+                        if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
+                            tmp = (row+y)*8 + col+x;
+                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                                return true;
+                            }
+                        }
+                        break;
+
+                    case 'N':
+                        if(0 <= row-2 && row-2 <= 7 && 0 <= col+1 && col+1 <= 7) {
+                            tmp = (row-2)*8 + col+1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-2 && row-2 <= 7 && 0 <= col-1 && col-1 <= 7) {
+                            tmp = (row-2)*8 + col-1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+2 && row+2 <= 7 && 0 <= col+1 && col+1 <= 7) {
+                            tmp = (row+2)*8 + col+1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+2 && row+2 <= 7 && 0 <= col-1 && col-1 <= 7) {
+                            tmp = (row+2)*8 + col-1;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+1 && row+1 <= 7 && 0 <= col+2 && col+2 <= 7) {
+                            tmp = (row+1)*8 + col+2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if((board.bitBoard[tmp] == 'k')) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-1 && row-1 <= 7 && 0 <= col+2 && col+2 <= 7) {
+                            tmp = (row-1)*8 + col+2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row+1 && row+1 <= 7 && 0 <= col-2 && col-2 <= 7) {
+                            tmp = (row+1)*8 + col-2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if(0 <= row-1 && row-1 <= 7 && 0 <= col-2 && col-2 <= 7) {
+                            tmp = (row-1)*8 + col-2;
+                            if(0 <= tmp && tmp <= 63) {
+                                if(board.bitBoard[tmp] == 'k') {
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+std::string ChessGame::fromAtoB(int frow, int fcol, int trow, int tcol) {
+    std::string str = board.bitBoard;
+    str[trow * 8 + tcol] = str[frow * 8 + fcol];
+    str[frow * 8 + fcol] = ' ';
+    return str;
 }

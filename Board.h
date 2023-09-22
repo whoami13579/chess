@@ -5,6 +5,7 @@
 #ifndef CHESS_BOARD_H
 #define CHESS_BOARD_H
 
+#include <string>
 #include <SFML/Graphics.hpp>
 
 class Board : public sf::Drawable {
@@ -18,7 +19,8 @@ private:
     sf::RectangleShape squares[64];
     sf::Color c1;
     sf::Color c2;
-    char bitBoard[64]; //upper case : white pieces, lower case : black pieces.
+//    char bitBoard[64]; //upper case : white pieces, lower case : black pieces.
+    std::string bitBoard = std::string(64, ' '); // upper case : white pieces, lower case : black pieces.
 
     void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
     friend class ChessGame;

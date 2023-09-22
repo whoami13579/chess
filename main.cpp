@@ -8,7 +8,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(1700, 1200), "chess", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
     sf::Event event = sf::Event();
-    int x, y;
+    int x, y; // the position of mouse click
 
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -29,6 +29,7 @@ int main() {
                 }
             }
         }
+        window.clear();
         window.draw(chessGame);
         window.display();
     }
