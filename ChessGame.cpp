@@ -3,7 +3,6 @@
 //
 
 #include "ChessGame.h"
-#include <iostream>
 
 ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
     board = Board(c1, c2);
@@ -83,7 +82,7 @@ void ChessGame::restart() {
         pieces[i].moved = false;
     }
 
-    // the first turn is whte's turn
+    // the first turn is white's turn
     turn = true;
 }
 
@@ -1649,7 +1648,7 @@ void ChessGame::generate_moves(int row, int col) {
     }
 }
 
-bool ChessGame::isCheck(const std::string &bitboard) {;
+bool ChessGame::isCheck(const std::string &bitboard) {
     int x = 0, y = 0, tmp;
 
     if(turn) {
@@ -1674,7 +1673,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1684,7 +1683,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y++;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1692,7 +1691,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1702,7 +1701,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y--;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1710,7 +1709,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1720,7 +1719,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x++;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1728,7 +1727,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1738,7 +1737,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x--;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
                         break;
@@ -1746,80 +1745,80 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                     case 'k':
                         tmp = (row-1)*8 + col;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = (row-1)*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = row*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = row*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
 
                         tmp = (row-1)*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'K') {
+                            else if(bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -1831,7 +1830,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1844,7 +1843,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -1854,7 +1853,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1867,7 +1866,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -1877,7 +1876,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1890,7 +1889,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -1900,7 +1899,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1913,7 +1912,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -1925,7 +1924,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1935,7 +1934,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y++;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1943,7 +1942,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1953,7 +1952,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y--;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1961,7 +1960,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1971,7 +1970,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x++;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1979,7 +1978,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -1989,7 +1988,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x--;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                             return true;
                         }
 
@@ -1998,7 +1997,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2011,7 +2010,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -2021,7 +2020,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2034,7 +2033,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -2044,7 +2043,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2057,7 +2056,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -2067,7 +2066,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2080,7 +2079,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'K') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'K') {
                                 return true;
                             }
                         }
@@ -2090,7 +2089,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-2 && row-2 <= 7 && 0 <= col+1 && col+1 <= 7) {
                             tmp = (row-2)*8 + col+1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2099,7 +2098,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-2 && row-2 <= 7 && 0 <= col-1 && col-1 <= 7) {
                             tmp = (row-2)*8 + col-1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2108,7 +2107,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+2 && row+2 <= 7 && 0 <= col+1 && col+1 <= 7) {
                             tmp = (row+2)*8 + col+1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2117,7 +2116,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+2 && row+2 <= 7 && 0 <= col-1 && col-1 <= 7) {
                             tmp = (row+2)*8 + col-1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2126,7 +2125,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+1 && row+1 <= 7 && 0 <= col+2 && col+2 <= 7) {
                             tmp = (row+1)*8 + col+2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2135,7 +2134,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-1 && row-1 <= 7 && 0 <= col+2 && col+2 <= 7) {
                             tmp = (row-1)*8 + col+2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2144,7 +2143,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+1 && row+1 <= 7 && 0 <= col-2 && col-2 <= 7) {
                             tmp = (row+1)*8 + col-2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2153,7 +2152,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-1 && row-1 <= 7 && 0 <= col-2 && col-2 <= 7) {
                             tmp = (row-1)*8 + col-2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'K') {
+                                if(bitboard[tmp] == 'K') {
                                     return true;
                                 }
                             }
@@ -2185,7 +2184,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2195,7 +2194,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y++;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2203,7 +2202,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2213,7 +2212,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y--;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2221,7 +2220,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2231,7 +2230,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x++;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2239,7 +2238,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2249,7 +2248,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x--;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
                     break;
@@ -2257,80 +2256,80 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                     case 'K':
                         tmp = (row-1)*8 + col;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = (row-1)*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = row*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col+1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = (row+1)*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = row*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
 
                         tmp = (row-1)*8 + col-1;
                         if(0 <= tmp && tmp <= 63) {
-                            if(board.bitBoard[tmp] == ' ') {
+                            if(bitboard[tmp] == ' ') {
                                 ;
                             }
-                            else if(board.bitBoard[tmp] == 'k') {
+                            else if(bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2342,7 +2341,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2355,7 +2354,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2365,7 +2364,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2378,7 +2377,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2388,7 +2387,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2401,7 +2400,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2411,7 +2410,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2424,7 +2423,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2436,7 +2435,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2446,7 +2445,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y++;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2454,7 +2453,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7) {
                             tmp = (row+y)*8 + col;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2464,7 +2463,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             y--;
                         }
                         tmp = (row+y)*8 + col;
-                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= row+y && row+y <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2472,7 +2471,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2482,7 +2481,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x++;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2490,7 +2489,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= col+x && col+x <=7) {
                             tmp = row*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2500,7 +2499,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                             x--;
                         }
                         tmp = row*8 + col+x;
-                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                        if(0 <= col+x && col+x <= 7 && 0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                             return true;
                         }
 
@@ -2509,7 +2508,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2522,7 +2521,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2532,7 +2531,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2545,8 +2544,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
-                                std::cout << "check" << std::endl;
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2556,7 +2554,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2569,7 +2567,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2579,7 +2577,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         while(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == ' ') {
+                                if(bitboard[tmp] == ' ') {
                                     ;
                                 }
                                 else {
@@ -2592,7 +2590,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
 
                         if(0 <= row+y && row+y <=7 && 0 <= col+x && col+x <= 7) {
                             tmp = (row+y)*8 + col+x;
-                            if(0 <= tmp && tmp <= 63 && board.bitBoard[tmp] == 'k') {
+                            if(0 <= tmp && tmp <= 63 && bitboard[tmp] == 'k') {
                                 return true;
                             }
                         }
@@ -2602,7 +2600,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-2 && row-2 <= 7 && 0 <= col+1 && col+1 <= 7) {
                             tmp = (row-2)*8 + col+1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2611,7 +2609,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-2 && row-2 <= 7 && 0 <= col-1 && col-1 <= 7) {
                             tmp = (row-2)*8 + col-1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2620,7 +2618,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+2 && row+2 <= 7 && 0 <= col+1 && col+1 <= 7) {
                             tmp = (row+2)*8 + col+1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2629,7 +2627,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+2 && row+2 <= 7 && 0 <= col-1 && col-1 <= 7) {
                             tmp = (row+2)*8 + col-1;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2638,7 +2636,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+1 && row+1 <= 7 && 0 <= col+2 && col+2 <= 7) {
                             tmp = (row+1)*8 + col+2;
                             if(0 <= tmp && tmp <= 63) {
-                                if((board.bitBoard[tmp] == 'k')) {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2647,7 +2645,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-1 && row-1 <= 7 && 0 <= col+2 && col+2 <= 7) {
                             tmp = (row-1)*8 + col+2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2656,7 +2654,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row+1 && row+1 <= 7 && 0 <= col-2 && col-2 <= 7) {
                             tmp = (row+1)*8 + col-2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
@@ -2665,7 +2663,7 @@ bool ChessGame::isCheck(const std::string &bitboard) {;
                         if(0 <= row-1 && row-1 <= 7 && 0 <= col-2 && col-2 <= 7) {
                             tmp = (row-1)*8 + col-2;
                             if(0 <= tmp && tmp <= 63) {
-                                if(board.bitBoard[tmp] == 'k') {
+                                if(bitboard[tmp] == 'k') {
                                     return true;
                                 }
                             }
