@@ -9,7 +9,7 @@ include_directories(/usr/local/include)
 set(SOURCE_FILES main.cpp
         PieceTexture.cpp
         PieceTexture.h
-        Board.cpp Board.h LegalMove.cpp LegalMove.h ChessGame.cpp ChessGame.h Piece.cpp Piece.h)
+        Board.cpp Board.h LegalMove.cpp LegalMove.h ChessGame.cpp ChessGame.h Piece.cpp Piece.h Promotion.cpp Promotion.h)
 
 add_executable(chess ${SOURCE_FILES})
 target_link_libraries(chess sfml-system sfml-window sfml-graphics sfml-audio sfml-network)

@@ -4,8 +4,11 @@
 
 #include "ChessGame.h"
 
-ChessGame::ChessGame(sf::Color c1, sf::Color c2) {
+ChessGame::ChessGame(sf::RenderWindow *window, sf::Event *event, sf::Color c1, sf::Color c2) {
+    this->window = window;
+    this->event = event;
     board = Board(c1, c2);
+    promotion = Promotion(sf::Color::Green);
 
     font.loadFromFile("../Textures/arial.ttf");
 
@@ -32,9 +35,14 @@ void ChessGame::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(legalMove);
     target.draw(restartButton);
     target.draw(restartText);
+
+    if(promote) {
+        target.draw(promotion);
+    }
 }
 
 void ChessGame::restart() {
+    createPieces();
     board.reset();
     legalMove.reset();
 
@@ -84,9 +92,14 @@ void ChessGame::restart() {
 
     // the first turn is white's turn
     turn = true;
+    promote = false;
+    wCastleK = false;
+    wCastleK = false;
+    bCastleK = false;
+    bCastleQ = false;
 }
 
-void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int col) {
+void ChessGame::select(int row, int col) {
     // the user selects white piece on black's turn, return
     if ((!turn) && ('A' <= board.bitBoard[row * 8 + col] && board.bitBoard[row * 8 + col] <= 'Z')) {
         return;
@@ -104,8 +117,8 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
 
     // generate the legal movies and draw the game
     generate_moves(row, col);
-    window.draw(*this);
-    window.display();
+    window->draw(*this);
+    window->display();
 
     // int i;
     // for (i = 0; i < 32; i++) {
@@ -119,16 +132,16 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
 
     int x, y; // the position of mouse click
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
+    while (window->isOpen()) {
+        while (window->pollEvent(*event)) {
+            if (event->type == sf::Event::Closed) {
+                window->close();
             }
 
-            if (event.type == sf::Event::MouseButtonPressed) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    x = event.mouseButton.x;
-                    y = event.mouseButton.y;
+            if (event->type == sf::Event::MouseButtonPressed) {
+                if (event->mouseButton.button == sf::Mouse::Left) {
+                    x = event->mouseButton.x;
+                    y = event->mouseButton.y;
                     if ((0 < x) && (x < 1200) && (0 < y) && (y < 1200)) {
                         // if the user clicks the same piece, return
                         if(x/150 == col && y/150 == row) {
@@ -149,7 +162,7 @@ void ChessGame::select(sf::Event &event, sf::RenderWindow &window, int row, int 
                         restart();
                         return;
                     }
-                } else if (event.mouseButton.button == sf::Mouse::Right) {
+                } else if (event->mouseButton.button == sf::Mouse::Right) {
                     return;
                 } else {
                     return;
@@ -218,6 +231,14 @@ void ChessGame::move(int frow, int fcol, int trow, int tcol) {
 
     board.bitBoard[trow * 8 + tcol] = board.bitBoard[frow * 8 + fcol];
     board.bitBoard[frow * 8 + fcol] = ' ';
+
+    if(trow == 0 && board.bitBoard[trow * 8 + tcol] == 'P') {
+        wPromotion(findPiece(trow, tcol), tcol);
+    }
+    
+    if(trow == 7 && board.bitBoard[trow * 8 + tcol] == 'p') {
+        bPromotion(findPiece(trow, tcol), tcol);
+    }
 
     turn = !turn;
 }
@@ -2682,4 +2703,154 @@ std::string ChessGame::fromAtoB(int frow, int fcol, int trow, int tcol) {
     str[trow * 8 + tcol] = str[frow * 8 + fcol];
     str[frow * 8 + fcol] = ' ';
     return str;
+}
+
+void ChessGame::wPromotion(Piece *piece, int col) {
+    for(int i = 0; i < 4; i++) {
+        promotion.squares[i].setPosition(sf::Vector2f(col * 150.f, (i) * 150.f));
+    }
+
+    promotion.fourPieces[0].setTexture(PieceTexture::whiteQueen);
+    promotion.fourPieces[1].setTexture(PieceTexture::whiteKnight);
+    promotion.fourPieces[2].setTexture(PieceTexture::whiteRook);
+    promotion.fourPieces[3].setTexture(PieceTexture::whiteBishop);
+
+    for(int i = 0; i < 4; i++) {
+        promotion.fourPieces[i].setOrigin(sf::Vector2f(float(promotion.fourPieces[i].getTexture()->getSize().x / 2), float(promotion.fourPieces[i].getTexture()->getSize().y / 2)));
+        promotion.fourPieces[i].setScale(sf::Vector2f(1, 1));
+        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*150 + 150/2, (float)i*150 + 150/2));
+    }
+
+    promote = true;
+
+    window->draw(*this);
+    window->display();
+
+    int x, y;
+
+    while(window->isOpen()) {
+        while(window->pollEvent(*event)) {
+            if(event->type == sf::Event::Closed) {
+                window->close();
+            }
+
+            if(event->type == sf::Event::MouseButtonPressed) {
+                if(event->mouseButton.button == sf::Mouse::Left) {
+                    x = event->mouseButton.x;
+                    y = event->mouseButton.y;
+
+                    if(y / 150 == 0) {
+                        board.bitBoard[0 * 8 + col] = 'Q';
+                        *piece = Piece('Q');
+                        piece->setPosition(0, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 1) {
+                        board.bitBoard[0 * 8 + col] = 'N';
+                        *piece = Piece('N');
+                        piece->setPosition(0, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 2) {
+                        board.bitBoard[0 * 8 + col] = 'R';
+                        *piece = Piece('R');
+                        piece->setPosition(0, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 3) {
+                        board.bitBoard[0 * 8 + col] = 'B';
+                        *piece = Piece('B');
+                        piece->setPosition(0, col);
+                        promote = false;
+                        return;
+                    }
+                    else if((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                        restart();
+                        promote = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    promote = false;
+}
+
+void ChessGame::bPromotion(Piece *piece, int col) {
+    for(int i = 0; i < 4; i++) {
+        promotion.squares[i].setPosition(sf::Vector2f(col * 150.f, (i + 4) * 150.f));
+    }
+
+    promotion.fourPieces[0].setTexture(PieceTexture::blackBishop);
+    promotion.fourPieces[1].setTexture(PieceTexture::blackRook);
+    promotion.fourPieces[2].setTexture(PieceTexture::blackKnight);
+    promotion.fourPieces[3].setTexture(PieceTexture::blackQueen);
+
+    for(int i = 0; i < 4; i++) {
+        promotion.fourPieces[i].setOrigin(sf::Vector2f(float(promotion.fourPieces[i].getTexture()->getSize().x / 2), float(promotion.fourPieces[i].getTexture()->getSize().y / 2)));
+        promotion.fourPieces[i].setScale(sf::Vector2f(1, 1));
+        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*150 + 150/2, (float)(i + 4)*150 + 150/2));
+    }
+
+    promote = true;
+
+    window->draw(*this);
+    window->display();
+
+    int x, y;
+
+    while(window->isOpen()) {
+        while(window->pollEvent(*event)) {
+            if(event->type == sf::Event::Closed) {
+                window->close();
+            }
+
+            if(event->type == sf::Event::MouseButtonPressed) {
+                if(event->mouseButton.button == sf::Mouse::Left) {
+                    x = event->mouseButton.x;
+                    y = event->mouseButton.y;
+
+                    if(y / 150 == 7) {
+                        board.bitBoard[7 * 8 + col] = 'q';
+                        *piece = Piece('q');
+                        piece->setPosition(7, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 6) {
+                        board.bitBoard[7 * 8 + col] = 'n';
+                        *piece = Piece('n');
+                        piece->setPosition(7, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 5) {
+                        board.bitBoard[7 * 8 + col] = 'r';
+                        *piece = Piece('r');
+                        piece->setPosition(7, col);
+                        promote = false;
+                        return;
+                    }
+                    else if(y / 150 == 4) {
+                        board.bitBoard[7 * 8 + col] = 'b';
+                        *piece = Piece('b');
+                        piece->setPosition(7, col);
+                        promote = false;
+                        return;
+                    }
+                    else if((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                        restart();
+                        promote = false;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    promote = false;
 }
