@@ -149,7 +149,7 @@ void ChessGame::select(int row, int col) {
                             return;
                         }
 
-                        // if the square the user clicks is not an legal move, return
+                        // if the square the user clicks is not a legal move, return
                         if(legalMove.bitBoard[(y/150)*8 + (x/150)] == false) {
                             legalMove.reset();
                             return;
