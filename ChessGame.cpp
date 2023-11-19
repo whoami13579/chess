@@ -219,6 +219,112 @@ void ChessGame::move(int frow, int fcol, int trow, int tcol) {
         return;
     }
 
+    if(board.bitBoard[frow * 8 + fcol] == 'K' && trow == 7 && tcol == 6 && legalMove.bitBoard[7 * 8 + 6]) {
+        Piece *k = findPiece(frow, fcol);
+        Piece *r = findPiece(7, 7);
+
+        if(k->moved || r->moved) {
+            goto noCastle;
+        }
+
+        k->setPosition(7, 6);
+        board.bitBoard[7 * 8 + 6] = 'K';
+
+        r->setPosition(7, 5);
+        board.bitBoard[7 * 8 + 5] = 'R';
+
+
+        board.bitBoard[frow * 8 + fcol] = ' ';
+        board.bitBoard[7 * 8 + 7] = ' ';
+
+        k->moved = true;
+        r->moved = true;
+
+        legalMove.reset();
+        turn = !turn;
+        return;
+    }
+
+    if(board.bitBoard[frow * 8 + fcol] == 'k' && trow == 0 && tcol == 6 && legalMove.bitBoard[0 * 8 + 6]) {
+        Piece *k = findPiece(frow, fcol);
+        Piece *r = findPiece(0, 7);
+
+        if(k->moved || r->moved) {
+            goto noCastle;
+        }
+
+        k->setPosition(0, 6);
+        board.bitBoard[0 * 8 + 6] = 'k';
+
+        r->setPosition(0, 5);
+        board.bitBoard[0 * 8 + 5] = 'r';
+
+
+        board.bitBoard[frow * 8 + fcol] = ' ';
+        board.bitBoard[0 * 8 + 7] = ' ';
+
+        k->moved = true;
+        r->moved = true;
+
+        legalMove.reset();
+        turn = !turn;
+        return;
+    }
+
+    if(board.bitBoard[frow * 8 + fcol] == 'K' && trow == 7 && tcol == 2 && legalMove.bitBoard[7 * 8 + 2]) {
+        Piece *k = findPiece(frow, fcol);
+        Piece *r = findPiece(7, 0);
+
+        if(k->moved || r->moved) {
+            goto noCastle;
+        }
+
+        k->setPosition(7, 2);
+        board.bitBoard[7 * 8 + 2] = 'K';
+
+        r->setPosition(7, 3);
+        board.bitBoard[7 * 8 + 3] = 'R';
+
+
+        board.bitBoard[frow * 8 + fcol] = ' ';
+        board.bitBoard[7 * 8 + 0] = ' ';
+
+        k->moved = true;
+        r->moved = true;
+
+        legalMove.reset();
+        turn = !turn;
+        return;
+    }
+
+    if(board.bitBoard[frow * 8 + fcol] == 'k' && trow == 0 && tcol == 2 && legalMove.bitBoard[0 * 8 + 2]) {
+        Piece *k = findPiece(frow, fcol);
+        Piece *r = findPiece(0, 0);
+
+        if(k->moved || r->moved) {
+            goto noCastle;
+        }
+
+        k->setPosition(0, 2);
+        board.bitBoard[0 * 8 + 2] = 'k';
+
+        r->setPosition(0, 3);
+        board.bitBoard[0 * 8 + 3] = 'r';
+
+
+        board.bitBoard[frow * 8 + fcol] = ' ';
+        board.bitBoard[0 * 8 + 0] = ' ';
+
+        k->moved = true;
+        r->moved = true;
+
+        legalMove.reset();
+        turn = !turn;
+        return;
+    }
+
+    noCastle:
+
     if (Piece *p = findPiece(trow, tcol)) {
         p->taken = true;
     }
@@ -255,6 +361,8 @@ Piece *ChessGame::findPiece(int row, int col) {
 
 void ChessGame::generate_moves(int row, int col) {
     int x = 0, y = 0, tmp;
+    Piece *k;
+    Piece *r;
     switch (board.bitBoard[row * 8 + col]) {
         case 'P':
             if (row == 6 && board.bitBoard[(row-1)*8 + col] == ' ' && board.bitBoard[(row-2)*8 + col] == ' ') {
@@ -680,6 +788,29 @@ void ChessGame::generate_moves(int row, int col) {
                     }
                 }
             }
+
+            k = findPiece(row, col);
+            if(!isCheck(fromAtoB(row, col, row, col)) && k && !k->moved) {
+                if(board.bitBoard[7 * 8 + 5] == ' ' && board.bitBoard[7 * 8 + 6] == ' ' && board.bitBoard[7 * 8 + 7] == 'R') {
+                    r = findPiece(7, 7);
+                    if(r && !r->moved) {
+                        if(!isCheck(fromAtoB(7, 4, 7, 5)) && !isCheck(fromAtoB(7, 4, 7, 6))) {
+                            legalMove.setMove(7, 6);
+                            legalMove.bitBoard[7 * 8 + 6] = true;
+                        }
+                    }
+                }
+
+                if(board.bitBoard[7 * 8 + 3] == ' ' && board.bitBoard[7 * 8 + 2] == ' ' && board.bitBoard[7 * 8 + 1] == ' ' && board.bitBoard[7 * 8 + 0] == 'R') {
+                    r = findPiece(7, 0);
+                    if(r && !r->moved) {
+                        if(!isCheck(fromAtoB(7, 4, 7, 3)) && !isCheck(fromAtoB(7, 4, 7, 2)) && !isCheck(fromAtoB(7, 4, 7, 1))) {
+                            legalMove.setMove(7, 2);
+                            legalMove.bitBoard[7 * 8 + 2] = true;
+                        }
+                    }
+                }
+            }
             break;
         case 'k':
             tmp = (row-1)*8 + col;
@@ -806,6 +937,29 @@ void ChessGame::generate_moves(int row, int col) {
                     if(!isCheck(fromAtoB(row, col, row - 1, col - 1))) {
                         legalMove.setMove(row-1, col-1);
                         legalMove.bitBoard[tmp] = true;
+                    }
+                }
+            }
+
+            k = findPiece(row, col);
+            if(!isCheck(fromAtoB(row, col, row, col)) && k && !k->moved) {
+                if(board.bitBoard[0 * 8 + 5] == ' ' && board.bitBoard[0 * 8 + 6] == ' ' && board.bitBoard[0 * 8 + 7] == 'r') {
+                    r = findPiece(0, 7);
+                    if(r && !r->moved) {
+                        if(!isCheck(fromAtoB(0, 4, 0, 5)) && !isCheck(fromAtoB(0, 4, 0, 6))) {
+                            legalMove.setMove(0, 6);
+                            legalMove.bitBoard[0 * 8 + 6] = true;
+                        }
+                    }
+                }
+
+                if(board.bitBoard[0 * 8 + 3] == ' ' && board.bitBoard[0 * 8 + 2] == ' ' && board.bitBoard[0 * 8 + 1] == ' ' && board.bitBoard[0 * 8 + 0] == 'r') {
+                    r = findPiece(0, 0);
+                    if(r && !r->moved) {
+                        if(!isCheck(fromAtoB(0, 4, 0, 3)) && !isCheck(fromAtoB(0, 4, 0, 2)) && !isCheck(fromAtoB(0, 4, 0, 1))) {
+                            legalMove.setMove(0, 2);
+                            legalMove.bitBoard[0 * 8 + 2] = true;
+                        }
                     }
                 }
             }
