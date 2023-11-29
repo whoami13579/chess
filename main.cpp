@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1700, 1200), "chess", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(890, 640), "chess", sf::Style::Close);
     window.setVerticalSyncEnabled(true);
     sf::Event event = sf::Event();
 
@@ -21,9 +21,9 @@ int main() {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     x = event.mouseButton.x;
                     y = event.mouseButton.y;
-                    if ((0 < x) && (x < 1200) && (0 < y) && (y < 1200)) {
-                        chessGame.select(int(y / 150), int(x / 150));
-                    } else if ((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                    if ((0 < x) && (x < 640) && (0 < y) && (y < 640)) {
+                        chessGame.select(int(y / 80), int(x / 80));
+                    } else if ((640 < x) && (x < 890) && (0 < y) && (y < 50)) {
                         chessGame.restart();
                     }
                 }
