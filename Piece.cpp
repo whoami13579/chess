@@ -49,7 +49,7 @@ Piece::Piece(char type) {
     }
 
     sprite.setOrigin(sf::Vector2f(float(sprite.getTexture()->getSize().x / 2), float(sprite.getTexture()->getSize().y / 2)));
-    sprite.setScale(sf::Vector2f(1, 1));
+    sprite.setScale(sf::Vector2f(0.5, 0.5));
 
 }
 
@@ -64,7 +64,7 @@ void Piece::setPosition(int row, int col)
     this->row = row;
     this->col = col;
 
-    sprite.setPosition(sf::Vector2f((float)col*150 + 150/2, (float)row*150 + 150/2));
+    sprite.setPosition(sf::Vector2f((float)col*80 + 80/2, (float)row*80 + 80/2));
 }
 
 short Piece::getRow() {

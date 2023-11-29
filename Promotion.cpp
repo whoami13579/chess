@@ -6,7 +6,7 @@
 
 Promotion::Promotion(sf::Color color) {
     for(int i = 0; i < 4; i++) {
-        squares[i].setSize(sf::Vector2f(150.f, 150.f));
+        squares[i].setSize(sf::Vector2f(80.f, 80.f));
         squares[i].setFillColor(color);
     }
 }

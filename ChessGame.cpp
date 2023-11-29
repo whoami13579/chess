@@ -15,15 +15,15 @@ ChessGame::ChessGame(sf::RenderWindow *window, sf::Event *event, sf::Color c1, s
     restartButton.setFillColor(sf::Color::White);
     restartButton.setOutlineThickness(-5.f);
     restartButton.setOutlineColor(sf::Color::Black);
-    restartButton.setPosition(sf::Vector2f(1200.f, 0.f));
-    restartButton.setSize(sf::Vector2f(500.f, 50.f));
+    restartButton.setPosition(sf::Vector2f(640.f, 0.f));
+    restartButton.setSize(sf::Vector2f(250.f, 50.f));
 
     restartText.setFont(font);
     restartText.setString("RESTART");
     restartText.setCharacterSize(24);
     restartText.setStyle(sf::Text::Bold);
     restartText.setFillColor(sf::Color::Black);
-    restartText.setPosition(restartButton.getPosition().x + 180.f, restartButton.getPosition().y + 10.f);
+    restartText.setPosition(restartButton.getPosition().x + 65.f, restartButton.getPosition().y + 10.f);
 
     createPieces();
     restart();
@@ -52,8 +52,8 @@ void ChessGame::restart() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             tmp = (i * 8) + j;
-            board.squares[tmp].setPosition(float(i * 150), float(j * 150));
-            board.squares[tmp].setSize(sf::Vector2f((float) 150, (float) 150));
+            board.squares[tmp].setPosition(float(i * 80), float(j * 80));
+            board.squares[tmp].setSize(sf::Vector2f((float) 80, (float) 80));
             board.squares[tmp].setFillColor((color ? board.c1 : board.c2));
 
             color = !color;
@@ -142,23 +142,23 @@ void ChessGame::select(int row, int col) {
                 if (event->mouseButton.button == sf::Mouse::Left) {
                     x = event->mouseButton.x;
                     y = event->mouseButton.y;
-                    if ((0 < x) && (x < 1200) && (0 < y) && (y < 1200)) {
+                    if ((0 < x) && (x < 640) && (0 < y) && (y < 640)) {
                         // if the user clicks the same piece, return
-                        if(x/150 == col && y/150 == row) {
+                        if(x/80 == col && y/80 == row) {
                             legalMove.reset();
                             return;
                         }
 
                         // if the square the user clicks is not a legal move, return
-                        if(legalMove.bitBoard[(y/150)*8 + (x/150)] == false) {
+                        if(legalMove.bitBoard[(y/80)*8 + (x/80)] == false) {
                             legalMove.reset();
                             return;
                         }
 
 
-                        move(row, col, (int) (y / 150), (int) (x / 150));
+                        move(row, col, (int) (y / 80), (int) (x / 80));
                         return;
-                    } else if ((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                    } else if ((640 < x) && (x < 890) && (0 < y) && (y < 50)) {
                         restart();
                         return;
                     }
@@ -2861,7 +2861,7 @@ std::string ChessGame::fromAtoB(int frow, int fcol, int trow, int tcol) {
 
 void ChessGame::wPromotion(Piece *piece, int col) {
     for(int i = 0; i < 4; i++) {
-        promotion.squares[i].setPosition(sf::Vector2f(col * 150.f, (i) * 150.f));
+        promotion.squares[i].setPosition(sf::Vector2f(col * 80.f, (i) * 80.f));
     }
 
     promotion.fourPieces[0].setTexture(PieceTexture::whiteQueen);
@@ -2871,8 +2871,8 @@ void ChessGame::wPromotion(Piece *piece, int col) {
 
     for(int i = 0; i < 4; i++) {
         promotion.fourPieces[i].setOrigin(sf::Vector2f(float(promotion.fourPieces[i].getTexture()->getSize().x / 2), float(promotion.fourPieces[i].getTexture()->getSize().y / 2)));
-        promotion.fourPieces[i].setScale(sf::Vector2f(1, 1));
-        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*150 + 150/2, (float)i*150 + 150/2));
+        promotion.fourPieces[i].setScale(sf::Vector2f(0.5, 0.5));
+        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*80 + 80/2, (float)i*80 + 80/2));
     }
 
     promote = true;
@@ -2893,35 +2893,35 @@ void ChessGame::wPromotion(Piece *piece, int col) {
                     x = event->mouseButton.x;
                     y = event->mouseButton.y;
 
-                    if(y / 150 == 0) {
+                    if(y / 80 == 0) {
                         board.bitBoard[0 * 8 + col] = 'Q';
                         *piece = Piece('Q');
                         piece->setPosition(0, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 1) {
+                    else if(y / 80 == 1) {
                         board.bitBoard[0 * 8 + col] = 'N';
                         *piece = Piece('N');
                         piece->setPosition(0, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 2) {
+                    else if(y / 80 == 2) {
                         board.bitBoard[0 * 8 + col] = 'R';
                         *piece = Piece('R');
                         piece->setPosition(0, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 3) {
+                    else if(y / 80 == 3) {
                         board.bitBoard[0 * 8 + col] = 'B';
                         *piece = Piece('B');
                         piece->setPosition(0, col);
                         promote = false;
                         return;
                     }
-                    else if((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                    else if((640 < x) && (x < 890) && (0 < y) && (y < 50)) {
                         restart();
                         promote = false;
                         return;
@@ -2936,7 +2936,7 @@ void ChessGame::wPromotion(Piece *piece, int col) {
 
 void ChessGame::bPromotion(Piece *piece, int col) {
     for(int i = 0; i < 4; i++) {
-        promotion.squares[i].setPosition(sf::Vector2f(col * 150.f, (i + 4) * 150.f));
+        promotion.squares[i].setPosition(sf::Vector2f(col * 80.f, (i + 4) * 80.f));
     }
 
     promotion.fourPieces[0].setTexture(PieceTexture::blackBishop);
@@ -2946,8 +2946,8 @@ void ChessGame::bPromotion(Piece *piece, int col) {
 
     for(int i = 0; i < 4; i++) {
         promotion.fourPieces[i].setOrigin(sf::Vector2f(float(promotion.fourPieces[i].getTexture()->getSize().x / 2), float(promotion.fourPieces[i].getTexture()->getSize().y / 2)));
-        promotion.fourPieces[i].setScale(sf::Vector2f(1, 1));
-        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*150 + 150/2, (float)(i + 4)*150 + 150/2));
+        promotion.fourPieces[i].setScale(sf::Vector2f(0.5, 0.5));
+        promotion.fourPieces[i].setPosition(sf::Vector2f((float)col*80 + 80/2, (float)(i + 4)*80 + 80/2));
     }
 
     promote = true;
@@ -2968,35 +2968,35 @@ void ChessGame::bPromotion(Piece *piece, int col) {
                     x = event->mouseButton.x;
                     y = event->mouseButton.y;
 
-                    if(y / 150 == 7) {
+                    if(y / 80 == 7) {
                         board.bitBoard[7 * 8 + col] = 'q';
                         *piece = Piece('q');
                         piece->setPosition(7, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 6) {
+                    else if(y / 80 == 6) {
                         board.bitBoard[7 * 8 + col] = 'n';
                         *piece = Piece('n');
                         piece->setPosition(7, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 5) {
+                    else if(y / 80 == 5) {
                         board.bitBoard[7 * 8 + col] = 'r';
                         *piece = Piece('r');
                         piece->setPosition(7, col);
                         promote = false;
                         return;
                     }
-                    else if(y / 150 == 4) {
+                    else if(y / 80 == 4) {
                         board.bitBoard[7 * 8 + col] = 'b';
                         *piece = Piece('b');
                         piece->setPosition(7, col);
                         promote = false;
                         return;
                     }
-                    else if((1200 < x) && (x < 1700) && (0 < y) && (y < 50)) {
+                    else if((640 < x) && (x < 890) && (0 < y) && (y < 50)) {
                         restart();
                         promote = false;
                         return;
