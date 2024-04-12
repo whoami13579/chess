@@ -4,7 +4,8 @@ project(chess)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
-include_directories(${SFML_INCLUDE_DIRS})
+# include_directories(${SFML_INCLUDE_DIRS})
+include_directories(sfml/2.6.1/include)
 # include_directories(usr/local/include)
 set(SOURCE_FILES main.cpp
         PieceTexture.cpp
