@@ -13,4 +13,5 @@ set(SOURCE_FILES main.cpp
         Board.cpp Board.h LegalMove.cpp LegalMove.h ChessGame.cpp ChessGame.h Piece.cpp Piece.h Promotion.cpp Promotion.h)
 
 add_executable(chess ${SOURCE_FILES})
+target_compile_definitions(chess PRIVATE CHESS_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Textures")
 target_link_libraries(chess PRIVATE sfml-graphics sfml-audio sfml-network sfml-window sfml-system)

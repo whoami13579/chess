@@ -10,7 +10,7 @@ ChessGame::ChessGame(sf::RenderWindow *window, sf::Event *event, sf::Color c1, s
     board = Board(c1, c2);
     promotion = Promotion(sf::Color::Green);
 
-    font.loadFromFile("../Textures/arial.ttf");
+    font.loadFromFile(std::string(CHESS_ASSET_DIR) + "/arial.ttf");
 
     restartButton.setFillColor(sf::Color::White);
     restartButton.setOutlineThickness(-5.f);

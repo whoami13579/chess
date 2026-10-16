@@ -6,20 +6,20 @@
 
 sf::Texture PieceTexture::loadTexture(const char *name) {
     sf::Texture tmp;
-    tmp.loadFromFile(name);
+    tmp.loadFromFile(std::string(CHESS_ASSET_DIR) + "/" + name);
 
     return tmp;
 }
 
-sf::Texture PieceTexture::whiteKing = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_king.png");
-sf::Texture PieceTexture::blackKing = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_king.png");
-sf::Texture PieceTexture::whiteQueen = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_queen.png");
-sf::Texture PieceTexture::blackQueen = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_queen.png");
-sf::Texture PieceTexture::whiteBishop = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_bishop.png");
-sf::Texture PieceTexture::blackBishop = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_bishop.png");
-sf::Texture PieceTexture::whiteKnight = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_knight.png");
-sf::Texture PieceTexture::blackKnight = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_knight.png");
-sf::Texture PieceTexture::whiteRook = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_rook.png");
-sf::Texture PieceTexture::blackRook = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_rook.png");
-sf::Texture PieceTexture::whitePawn = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/w_pawn.png");
-sf::Texture PieceTexture::blackPawn = PieceTexture::loadTexture("/Users/mba/Code/chess/Textures/b_pawn.png");
+sf::Texture PieceTexture::whiteKing = PieceTexture::loadTexture("w_king.png");
+sf::Texture PieceTexture::blackKing = PieceTexture::loadTexture("b_king.png");
+sf::Texture PieceTexture::whiteQueen = PieceTexture::loadTexture("w_queen.png");
+sf::Texture PieceTexture::blackQueen = PieceTexture::loadTexture("b_queen.png");
+sf::Texture PieceTexture::whiteBishop = PieceTexture::loadTexture("w_bishop.png");
+sf::Texture PieceTexture::blackBishop = PieceTexture::loadTexture("b_bishop.png");
+sf::Texture PieceTexture::whiteKnight = PieceTexture::loadTexture("w_knight.png");
+sf::Texture PieceTexture::blackKnight = PieceTexture::loadTexture("b_knight.png");
+sf::Texture PieceTexture::whiteRook = PieceTexture::loadTexture("w_rook.png");
+sf::Texture PieceTexture::blackRook = PieceTexture::loadTexture("b_rook.png");
+sf::Texture PieceTexture::whitePawn = PieceTexture::loadTexture("w_pawn.png");
+sf::Texture PieceTexture::blackPawn = PieceTexture::loadTexture("b_pawn.png");
