@@ -59,3 +59,14 @@ On Linux or macOS, run the local check. It first checks for CMake and a C++ comp
 ```
 
 The check builds in `build/environment-check`. To use another build directory, run `./scripts/check-environment.sh -DCHESS_CHECK_BUILD_DIR=/path/to/build`. On Windows, run `cmake -P cmake/CheckEnvironment.cmake` after installing CMake and a C++17 compiler.
+
+## Code tests
+
+Run the move-legality tests directly with CTest:
+
+```bash
+cmake -S . -B build
+cmake --build build
+cd build
+ctest --output-on-failure
+```
