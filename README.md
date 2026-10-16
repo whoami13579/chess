@@ -52,7 +52,7 @@ On multi-configuration generators, the executable is in a configuration subdirec
 
 ## Environment check
 
-On Linux or macOS, run the local check. It first checks for CMake and a C++ compiler, then verifies SFML, all required assets, and a complete build:
+On Linux or macOS, run the local check. It first checks for CMake and a C++ compiler, then verifies SFML and all required assets, builds the project, and runs the rule tests:
 
 ```bash
 ./scripts/check-environment.sh

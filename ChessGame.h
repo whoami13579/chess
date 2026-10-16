@@ -7,6 +7,7 @@
 
 #include <string>
 #include "Board.h"
+#include "ChessRules.h"
 #include "LegalMove.h"
 #include "Piece.h"
 #include "Promotion.h"
@@ -40,13 +41,8 @@ private:
     void bPromotion(Piece *piece, int col);
 
     Piece *findPiece(int row, int col);
-    bool isCheck(const std::string &bitboard);
-    bool wCastleK = true;
-    bool wCastleQ = true;
-    bool bCastleK = true;
-    bool bCastleQ = true;
+    ChessRules::CastlingRights castlingRights() const;
     bool promote = false;
-    std::string fromAtoB(int frow, int fcol, int trow, int tcol);
     sf::RenderWindow *window;
     sf::Event *event;
 };

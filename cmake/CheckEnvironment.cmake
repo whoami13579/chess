@@ -8,7 +8,7 @@ else()
 endif()
 
 execute_process(
-    COMMAND "${CMAKE_COMMAND}" -S "${source_dir}" -B "${build_dir}"
+    COMMAND "${CMAKE_COMMAND}" -S "${source_dir}" -B "${build_dir}" -DBUILD_TESTING=ON
     RESULT_VARIABLE configure_result)
 if(NOT configure_result EQUAL 0)
     message(FATAL_ERROR "Environment check failed during CMake configuration")
@@ -21,4 +21,16 @@ if(NOT build_result EQUAL 0)
     message(FATAL_ERROR "Environment check failed during compilation")
 endif()
 
-message(STATUS "Environment check passed: SFML found, assets present, project built")
+find_program(ctest_executable ctest)
+if(NOT ctest_executable)
+    message(FATAL_ERROR "Environment check requires CTest")
+endif()
+execute_process(
+    COMMAND "${ctest_executable}" --output-on-failure
+    WORKING_DIRECTORY "${build_dir}"
+    RESULT_VARIABLE test_result)
+if(NOT test_result EQUAL 0)
+    message(FATAL_ERROR "Environment check failed during tests")
+endif()
+
+message(STATUS "Environment check passed: SFML found, assets present, project built and tested")

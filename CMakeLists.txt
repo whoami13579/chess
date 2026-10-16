@@ -20,6 +20,7 @@ foreach(asset IN LISTS CHESS_REQUIRED_ASSETS)
 endforeach()
 
 set(SOURCE_FILES main.cpp
+        ChessRules.cpp ChessRules.h
         PieceTexture.cpp
         PieceTexture.h
         Board.cpp Board.h LegalMove.cpp LegalMove.h ChessGame.cpp ChessGame.h Piece.cpp Piece.h Promotion.cpp Promotion.h)
@@ -27,3 +28,10 @@ set(SOURCE_FILES main.cpp
 add_executable(chess ${SOURCE_FILES})
 target_compile_definitions(chess PRIVATE CHESS_ASSET_DIR="${CHESS_ASSET_DIR}")
 target_link_libraries(chess PRIVATE sfml-graphics)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(chess_rules_tests tests/ChessRulesTests.cpp ChessRules.cpp)
+    target_include_directories(chess_rules_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME chess_rules COMMAND chess_rules_tests)
+endif()
