@@ -1,17 +1,29 @@
-cmake_minimum_required(VERSION 3.25)
-project(chess)
+cmake_minimum_required(VERSION 3.16)
+project(chess LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(SFML 2.6 COMPONENTS system window graphics network audio REQUIRED)
-# include_directories(${SFML_INCLUDE_DIRS})
-include_directories(sfml/2.6.1/include)
-# include_directories(usr/local/include)
+find_package(SFML 2.6 COMPONENTS graphics REQUIRED)
+
+set(CHESS_ASSET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Textures" CACHE PATH
+        "Directory containing the chess textures and font")
+set(CHESS_REQUIRED_ASSETS
+        arial.ttf
+        b_bishop.png b_king.png b_knight.png b_pawn.png b_queen.png b_rook.png
+        w_bishop.png w_king.png w_knight.png w_pawn.png w_queen.png w_rook.png)
+foreach(asset IN LISTS CHESS_REQUIRED_ASSETS)
+    if(NOT EXISTS "${CHESS_ASSET_DIR}/${asset}" OR IS_DIRECTORY "${CHESS_ASSET_DIR}/${asset}")
+        message(FATAL_ERROR "Missing required chess asset: ${CHESS_ASSET_DIR}/${asset}")
+    endif()
+endforeach()
+
 set(SOURCE_FILES main.cpp
         PieceTexture.cpp
         PieceTexture.h
         Board.cpp Board.h LegalMove.cpp LegalMove.h ChessGame.cpp ChessGame.h Piece.cpp Piece.h Promotion.cpp Promotion.h)
 
 add_executable(chess ${SOURCE_FILES})
-target_compile_definitions(chess PRIVATE CHESS_ASSET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Textures")
-target_link_libraries(chess PRIVATE sfml-graphics sfml-audio sfml-network sfml-window sfml-system)
+target_compile_definitions(chess PRIVATE CHESS_ASSET_DIR="${CHESS_ASSET_DIR}")
+target_link_libraries(chess PRIVATE sfml-graphics)
